@@ -4,5 +4,5 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  BASE_API: '"//192.168.1.37:8082/PeakeCloud/"',
+  BASE_API: '"//localhost:8880/"',
 })

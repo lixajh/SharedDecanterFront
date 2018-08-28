@@ -10,6 +10,7 @@ const service = axios.create({
   timeout: 60000 ,// 请求超时时间
   headers: {
     'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
+    'user_type':'manager',
     dataType:"json",
     // 'Access-Control-Allow-Origin': 'http://localhost:9528',
     // 'Access-Control-Allow-Credentials':  'true'
@@ -37,37 +38,29 @@ service.interceptors.response.use(
   /**
   * resultCode为FAIL是抛错
   */
+    const code = response.code
+
     const res = response.data
     
 
       // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
-      if (res.errorCode == -996) {
-        MessageBox.confirm('你已被登出，点击确定重新登录', '确定登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          store.commit('SET_LOGIN_STATUS', -1)
-          store.dispatch('FedLogOut').then(() => {
-            location.reload()// 为了重新实例化vue-router对象 避免bug
-          })
-        })
-        return Promise.reject('error')
-      }
-      if (res.errorCode == -997) {
-        
-        store.commit('SET_LOGIN_STATUS', -1)
-        location.reload()
-        return Promise.reject('error')
-        
-      }
-      if (res.errorCode == -999) { 
-        return Promise.reject('error')
-        
-      }
-      if (res.errorCode == -796) { 
+      // if (code == 400) {
+      //   MessageBox.confirm('你已被登出，点击确定重新登录', '确定登出', {
+      //     confirmButtonText: '重新登录',
+      //     cancelButtonText: '取消',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     store.commit('SET_LOGIN_STATUS', -1)
+      //     store.dispatch('FedLogOut').then(() => {
+      //       location.reload()// 为了重新实例化vue-router对象 避免bug
+      //     })
+      //   })
+      //   return Promise.reject('error')
+      // }
+
+      if (code == 400) { 
         Message({
-          message: "前置机离线，请稍后再试",
+          message: "参数错误",
           type: 'error',
           duration: 2 * 1000
         })
@@ -75,7 +68,7 @@ service.interceptors.response.use(
         
       }
 
-      if (res.resultCode == 'FAIL') {
+      if (code == 400) {
         Message({
           message: res.resultMsg,
           type: 'error',
@@ -84,7 +77,7 @@ service.interceptors.response.use(
 
       return Promise.reject(res)
     } else {
-      return response.data
+      return response
     }
   },
   error => {

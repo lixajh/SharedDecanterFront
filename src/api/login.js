@@ -15,7 +15,7 @@ import md5 from 'js-md5';
 
 export function login(username, password) {
 
-  return postWithoutCookie("/api/user/login",{'phone':username, 'password':md5(password),'deviceType':'PC'})
+  return postWithoutCookie("/manager/admin/login",{'username':username, 'password':md5(password)})
 }
 
 
