@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request from '@/network/request'
 import qs from 'qs';
 import Cookies from 'js-cookie'
 
@@ -24,8 +24,6 @@ export function post(url,data){
       method: 'post',
       data: qs.stringify(data)
       // qs.stringify({'params':JSON.stringify(data)})
-      
-      
     })
   }
   

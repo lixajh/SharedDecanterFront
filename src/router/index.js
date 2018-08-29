@@ -28,7 +28,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/visitor/visitorList',
+    redirect: '/manager/adminList',
     name: 'Index',
     hidden: true,
     // children: [{
@@ -38,17 +38,17 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/visitor',
+    path: '/manager',
     component: Layout,
-    redirect: 'visitorList',
-    name: 'Visitor',
-    meta: { title: '访客', icon: 'example' },
+    redirect: 'adminList',
+    name: 'Admin',
+    meta: { title: '管理员', icon: 'example' },
     children: [
       {
-        path: 'visitorList',
-        name: 'VisitorList',
-        component: () => import('@/views/table/index'),
-        meta: { title: '访客预约', icon: 'peoples' }
+        path: 'adminList',
+        name: 'AdminList',
+        component: () => import('@/views/admin/index'),
+        meta: { title: '管理员管理', icon: 'peoples' }
       },
     ]
   }, 
