@@ -52,11 +52,11 @@ const user = {
     GetBasicInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getBasicInfo().then(response => {
-          // const data = response.resultData
-          // var memberInfo = data.member_info
-          // commit('SET_ROLES', data.roles)
+          const data = response.data
+          var memberInfo = data
+          commit('SET_ROLES', 1)
           commit('SET_LOGIN_STATUS', 1)
-          // commit('SET_NAME', memberInfo.nickName)
+          commit('SET_NAME', memberInfo.username)
           // commit('SET_AVATAR', memberInfo.phone)
           resolve(response)
         }).catch(error => {

@@ -43,6 +43,14 @@ service.interceptors.response.use(
     const res = response.data
     
 
+     if (code == 401) {
+      store.commit('SET_LOGIN_STATUS', -1)
+      store.dispatch('FedLogOut').then(() => {
+        location.reload()// 为了重新实例化vue-router对象 避免bug
+      })
+        return Promise.resolve()
+      }
+
       // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
       // if (code == 400) {
       //   MessageBox.confirm('你已被登出，点击确定重新登录', '确定登出', {
