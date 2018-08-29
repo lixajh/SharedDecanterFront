@@ -137,9 +137,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-        'default_operator_id'
-      ])
+    // ...mapGetters([
+    //     'default_operator_id'
+    //   ])
   },
   filters: {
     statusCssFilter:function(status) {
@@ -180,32 +180,32 @@ export default {
         this.row_index = 0;
       }
       
-      getVisitorList(this.start_date, this.end_date,this.page_size,this.row_index,this.default_operator_id).then(response => {
-        var data = response.resultData;
-        var dataList = data.dataList;
-        for (var i=0;i<dataList.length;i++){
-          dataList[i].passLoading=false;
-          dataList[i].rejectLoading=false;
-        }
-        this.list = dataList;
-        this.listLoading = false;
-        this.currentPage = data.pageNow;
-        this.totalSize = data.totalSize;
-        this.page_size = data.pageSize;
-      }).catch(e => {
-        this.listLoading = false
-      })
+      // getVisitorList(this.start_date, this.end_date,this.page_size,this.row_index,this.default_operator_id).then(response => {
+      //   var data = response.resultData;
+      //   var dataList = data.dataList;
+      //   for (var i=0;i<dataList.length;i++){
+      //     dataList[i].passLoading=false;
+      //     dataList[i].rejectLoading=false;
+      //   }
+      //   this.list = dataList;
+      //   this.listLoading = false;
+      //   this.currentPage = data.pageNow;
+      //   this.totalSize = data.totalSize;
+      //   this.page_size = data.pageSize;
+      // }).catch(e => {
+      //   this.listLoading = false
+      // })
     },
 
     detail(data){
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
-        if(response.resultCode=='SUCCESS'){
-          this.selectedRecord=response.resultData;
-        }
-      })
+      // getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
+      //   if(response.resultCode=='SUCCESS'){
+      //     this.selectedRecord=response.resultData;
+      //   }
+      // })
     },
 
     check(data,pass){
@@ -220,16 +220,16 @@ export default {
       }else{
         data.rejectLoading=true;
       }
-      checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
-          data.passLoading=false;
-          data.rejectLoading=false;
-        if(response.resultCode=='SUCCESS'){
-          this.fetchData()
-        }
-      }).catch(e =>{
-          data.passLoading=false;
-          data.rejectLoading=false;
-      })
+      // checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
+      //     data.passLoading=false;
+      //     data.rejectLoading=false;
+      //   if(response.resultCode=='SUCCESS'){
+      //     this.fetchData()
+      //   }
+      // }).catch(e =>{
+      //     data.passLoading=false;
+      //     data.rejectLoading=false;
+      // })
     },
      handleSizeChange(val) {
        localStorage.setItem('page_size',val)
@@ -246,10 +246,10 @@ export default {
   },
   watch: {
     // 如果 `question` 发生改变，这个函数就会运行
-    default_operator_id: function (after, before) {
-      this.answer = 'Waiting for you to stop typing...:'+after
-      this.fetchData();
-    },
+    // default_operator_id: function (after, before) {
+    //   this.answer = 'Waiting for you to stop typing...:'+after
+    //   this.fetchData();
+    // },
   }
 }
 </script>

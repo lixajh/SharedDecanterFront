@@ -8,7 +8,7 @@
         <i class="el-icon-caret-bottom"></i>
       </div> -->
       <span class="el-dropdown-link" >
-    {{ name}} | {{ operatorName}}<i class="el-icon-arrow-down el-icon--right"></i>
+    {{ name}} <i class="el-icon-arrow-down el-icon--right"></i>
   </span>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <!-- <router-link class="inlineBlock" to="/">
@@ -26,12 +26,12 @@
       </el-dropdown-menu>
     </el-dropdown>
 
-    <el-dialog title="切换运营商" :visible.sync="dialogTableVisible"  width='400px'>
+    <!-- <el-dialog title="切换运营商" :visible.sync="dialogTableVisible"  width='400px'>
       <el-radio v-for="item in operators" :key="item.operatorId" v-model="defaultOperatorId" :label=item.operatorId >{{item.company_name}}</el-radio>
       <span slot="footer" class="dialog-footer">
       <el-button type="primary" @click="changeDefaultOp">确 定</el-button>
   </span>
-</el-dialog>
+</el-dialog> -->
 
   </el-menu>
 </template>
@@ -48,36 +48,13 @@ export default {
   },
   data(){
     return {
-      operatorName:'',
       dialogTableVisible:false,
-      operators:[],
-      defaultOperatorId:null
-      
     }
   },
   created () {
 
-    this.defaultOperatorId = this.default_operator_id;
+   
     this.$store.dispatch('GetBasicInfo');
-    this.$store.dispatch('GetCardList').then(response =>{
-      var cardList = response.resultData.list;
-      this.operators = cardList;
-    
-      if(cardList.length > 1 && this.default_operator_id != null){
-        for (var i=0;i<cardList.length;i++){
-          if(cardList[i].operatorId == this.default_operator_id){
-            //默认运营商在列表中，不用管
-            this.operatorName = cardList[i].company_name;
-            return;
-          }
-        }
-      }
-      //默认运营商不在列表中，使用第一个作为默认
-      var card0 = cardList[0];
-      this.operatorName = card0.company_name;  
-       this.defaultOperatorId = card0.operatorId;    
-      this.$store.commit('SET_DEFAULT_OPERATOR_ID',card0.operatorId);
-      })
   },
   computed: {
     ...mapGetters([
@@ -86,7 +63,6 @@ export default {
       'name',
       'default_operator_id'
     ]),
-    // defaultOperatorId:default_operator_id
   },
   methods: {
     toggleSideBar() {
@@ -97,18 +73,6 @@ export default {
         location.reload() // 为了重新实例化vue-router对象 避免bug
       })
     },
-    changeDefaultOp(){
-
-      this.dialogTableVisible = false;
-      var cardList = this.operators;
-      for (var i=0;i<cardList.length;i++){
-          if(cardList[i].operatorId == this.defaultOperatorId){
-            this.$store.commit('SET_DEFAULT_OPERATOR_ID',cardList[i].operatorId);
-            this.operatorName = cardList[i].company_name
-          }
-        }
-      
-    }
   }
 }
 </script>

@@ -20,9 +20,7 @@ export default {
   },
   beforeMount () {
     this.$store.dispatch('GetBasicInfo').catch(e => {})
-    this.$store.dispatch('GetCardList').then(data =>{
-
-    })
+  
     if(this.$route.path == '/'){
       this.$router.push({name: 'Table', query: { 'operator_id':this.$route.query.operator_id }})
     }

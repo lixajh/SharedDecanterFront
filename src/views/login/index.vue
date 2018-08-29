@@ -33,11 +33,11 @@ export default {
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidPhone(value)) {
-        callback(new Error('请输入正确的手机号'))
-      } else {
+      // if (!isvalidPhone(value)) {
+      //   callback(new Error('请输入正确的手机号'))
+      // } else {
         callback()
-      }
+      // }
     }
     const validatePass = (rule, value, callback) => {
       if (value.length < 1) {
@@ -71,9 +71,6 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          // this.$cookie.set('sid','111');
-          // var aaa = this.$cookie.get('sid');
-          // console.log("aa:" + aaa)
           this.$store.dispatch('Login', this.loginForm).then(() => {
             this.loading = false
             this.$router.push({ path: '/' ,query: { 'operator_id':this.$route.query.operator_id }})

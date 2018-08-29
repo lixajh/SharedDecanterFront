@@ -20,12 +20,10 @@ export function login(username, password) {
 
 
 export function getBasicInfo() {
-  return post("/api/user/getBasicInfo",null)
+  return post("/manager/admin/detail",null)
 }
 
-export function getCardList() {
-  return post("/api/card/getSysList",null)
-}
+
 
 export function logout() {
   return post("/api/user/logout",null)

@@ -12,9 +12,6 @@ const service = axios.create({
     'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
     'user_type':'manager',
     dataType:"json",
-    // 'Access-Control-Allow-Origin': 'http://localhost:9528',
-    // 'Access-Control-Allow-Credentials':  'true'
-    // 'authKey': Lockr.get("authKey"),
 }
 })
 
@@ -23,12 +20,10 @@ service.interceptors.request.use(request => {
   // if (store.getters.token) {
   //   config.headers['X-Token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   // }
-  // console.log(request.headers)
 
   return request
 }, error => {
-  // Do something with request error
-  console.log(error) // for debug
+  console.log(error)
   Promise.reject(error)
 })
 
@@ -38,8 +33,6 @@ service.interceptors.response.use(
   /**
   * resultCode为FAIL是抛错
   */
-    const code = response.code
-
     const res = response.data
     
 
@@ -57,10 +50,27 @@ service.interceptors.response.use(
       //   })
       //   return Promise.reject('error')
       // }
+      if (res.code == 401) { 
+        store.commit('SET_LOGIN_STATUS', -1)
+            store.dispatch('FedLogOut').then(() => {
+              location.reload()// 为了重新实例化vue-router对象 避免bug
+            })
+        return Promise.reslove()
+        
+      }
 
-      if (code == 400) { 
+      if (res.code == 400) { 
         Message({
-          message: "参数错误",
+          message: res.message,
+          type: 'error',
+          duration: 2 * 1000
+        })
+        return Promise.reject('error')
+        
+      }
+      if (res.code == 404) { 
+        Message({
+          message: res.message,
           type: 'error',
           duration: 2 * 1000
         })
@@ -68,17 +78,8 @@ service.interceptors.response.use(
         
       }
 
-      if (code == 400) {
-        Message({
-          message: res.resultMsg,
-          type: 'error',
-          duration: 2 * 1000
-        })
-
-      return Promise.reject(res)
-    } else {
-      return response
-    }
+      return Promise.resolve(response)
+    
   },
   error => {
     console.log('err' + error.code)// for debug
