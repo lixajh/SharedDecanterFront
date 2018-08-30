@@ -1,4 +1,4 @@
-import { login, logout, getBasicInfo,getCardList } from '@/api/login'
+import { login, logout, getBasicInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -6,9 +6,6 @@ const user = {
     login_status: 0,//0:位置 -1：未登录 1：登陆
     name: '',
     avatar: '',
-    roles: [],
-    cards: [],
-    default_operator_id:''
   },
 
   mutations: {
@@ -21,15 +18,6 @@ const user = {
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
-    },
-    SET_CARDS: (state, cards) => {
-      state.cards = cards
-    },
-    SET_DEFAULT_OPERATOR_ID: (state, default_operator_id) => {
-      state.default_operator_id = default_operator_id
-    }
   },
 
   actions: {
@@ -52,27 +40,24 @@ const user = {
     GetBasicInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getBasicInfo().then(response => {
+<<<<<<< HEAD
           const data = response.data
           var memberInfo = data
           commit('SET_ROLES', 1)
           commit('SET_LOGIN_STATUS', 1)
           commit('SET_NAME', memberInfo.username)
           // commit('SET_AVATAR', memberInfo.phone)
+=======
+          const data = response.data.data
+          var memberInfo = data
+          // commit('SET_ROLES', data.roles)
+          commit('SET_LOGIN_STATUS', 1)
+      
+          commit('SET_NAME', memberInfo.username)
+          commit('SET_AVATAR', memberInfo.username)
+>>>>>>> 20526a15b6f1df6398971193e17c73f2ddcea479
           resolve(response)
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    // 获取卡列表
-    GetCardList({ commit, state }) {
-      return new Promise((resolve, reject) => {
-        getCardList().then(response => {
-          const data = response.resultData
-          var cardList = data.list       
-          commit('SET_CARDS', cardList)
-          resolve(response)
-        }).catch(error => {
+        }).catch(error => {  
           reject(error)
         })
       })

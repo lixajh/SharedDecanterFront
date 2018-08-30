@@ -1,5 +1,5 @@
-import request from '@/utils/request'
-import { post } from '@/utils/post'
+import request from '@/network/request'
+import { post } from '@/network/post'
 
 // export function getList(params) {
 //   return request({
@@ -10,10 +10,9 @@ import { post } from '@/utils/post'
 // }
 
 
-export function getVisitorList(start_date, end_date,page_size,row_index,sys_id) {
+export function getAdminList() {
 
-  return post("/api/visitor/v2/getVisitList",{'start_date':start_date
-            , 'end_date':end_date,'page_size':page_size,'row_index':row_index,'sys_id':sys_id})
+  return post("/manager/admin/list",{})
 }
 
 export function checkVisitor(record_id,check_status,sys_id) {

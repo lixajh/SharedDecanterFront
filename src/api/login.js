@@ -1,5 +1,5 @@
-import request from '@/utils/request'
-import { post ,postWithoutCookie} from '@/utils/post'
+import request from '@/network/request'
+import { post ,postWithoutCookie} from '@/network/post'
 import md5 from 'js-md5';
 
 // export function login(username, password) {
@@ -20,15 +20,13 @@ export function login(username, password) {
 
 
 export function getBasicInfo() {
-  return post("/api/user/getBasicInfo",null)
+  return post("/manager/admin/detail",null)
 }
 
-export function getCardList() {
-  return post("/api/card/getSysList",null)
-}
+
 
 export function logout() {
-  return post("/api/user/logout",null)
+  return post("/manager/admin/logout",null)
   // return request({
   //   url: '/user/logout',
   //   method: 'post'

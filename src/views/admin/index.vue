@@ -6,20 +6,20 @@
           {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column label="来访人">
+      <el-table-column label="用户名">
         <template slot-scope="scope">
-          {{scope.row.visitor}}
+          {{scope.row.username}}
         </template>
       </el-table-column>
-      <el-table-column label="证件号码" >
+      <el-table-column label="手机号码" >
         <template slot-scope="scope">
-          {{scope.row.card_id}}
+          {{scope.row.phone}}
         </template>
       </el-table-column>
-      <el-table-column label="到访时间" >
+      <el-table-column label="最后登录时间" >
         <template slot-scope="scope">
            <i class="el-icon-time"></i>
-          <span>{{scope.row.date}}</span>
+          <span>{{scope.row.lastLoginTime | formatDate}}</span>
         </template>
       </el-table-column>
 
@@ -113,7 +113,9 @@
 </template>
 
 <script>
-import { getVisitorList,checkVisitor,getVisitorDetail } from '@/api/table'
+
+import {formatDate} from '@/utils/date.js';
+import { getAdminList,checkVisitor,getVisitorDetail } from '@/api/admin'
 import { mapGetters } from 'vuex'
 export default {
   data() {
@@ -137,9 +139,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-        'default_operator_id'
-      ])
+    // ...mapGetters([
+    //     'default_operator_id'
+    //   ])
   },
   filters: {
     statusCssFilter:function(status) {
@@ -163,6 +165,10 @@ export default {
       }
       return statusMap[status]
     },
+      formatDate(time) {
+          var date = new Date(time);
+          return formatDate(date, 'yyyy-MM-dd hh:mm');
+      },
   },
 
   created() {
@@ -180,17 +186,17 @@ export default {
         this.row_index = 0;
       }
       
-      getVisitorList(this.start_date, this.end_date,this.page_size,this.row_index,this.default_operator_id).then(response => {
-        var data = response.resultData;
-        var dataList = data.dataList;
+      getAdminList().then(response => {
+        var data = response.data.data;
+        var dataList = data.list;
         for (var i=0;i<dataList.length;i++){
           dataList[i].passLoading=false;
           dataList[i].rejectLoading=false;
         }
         this.list = dataList;
         this.listLoading = false;
-        this.currentPage = data.pageNow;
-        this.totalSize = data.totalSize;
+        this.currentPage = data.pageNum;
+        this.totalSize = data.total;
         this.page_size = data.pageSize;
       }).catch(e => {
         this.listLoading = false
@@ -201,11 +207,11 @@ export default {
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
-        if(response.resultCode=='SUCCESS'){
-          this.selectedRecord=response.resultData;
-        }
-      })
+      // getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
+      //   if(response.resultCode=='SUCCESS'){
+      //     this.selectedRecord=response.resultData;
+      //   }
+      // })
     },
 
     check(data,pass){
@@ -220,16 +226,16 @@ export default {
       }else{
         data.rejectLoading=true;
       }
-      checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
-          data.passLoading=false;
-          data.rejectLoading=false;
-        if(response.resultCode=='SUCCESS'){
-          this.fetchData()
-        }
-      }).catch(e =>{
-          data.passLoading=false;
-          data.rejectLoading=false;
-      })
+      // checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
+      //     data.passLoading=false;
+      //     data.rejectLoading=false;
+      //   if(response.resultCode=='SUCCESS'){
+      //     this.fetchData()
+      //   }
+      // }).catch(e =>{
+      //     data.passLoading=false;
+      //     data.rejectLoading=false;
+      // })
     },
      handleSizeChange(val) {
        localStorage.setItem('page_size',val)
@@ -246,10 +252,10 @@ export default {
   },
   watch: {
     // 如果 `question` 发生改变，这个函数就会运行
-    default_operator_id: function (after, before) {
-      this.answer = 'Waiting for you to stop typing...:'+after
-      this.fetchData();
-    },
+    // default_operator_id: function (after, before) {
+    //   this.answer = 'Waiting for you to stop typing...:'+after
+    //   this.fetchData();
+    // },
   }
 }
 </script>
