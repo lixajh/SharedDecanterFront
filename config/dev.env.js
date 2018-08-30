@@ -4,5 +4,6 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  BASE_API: '"//localhost/server"',
+  // BASE_API: '"//localhost:8083/server"',
+  BASE_API: '"//peake.mynatapp.cc/server"',
 })

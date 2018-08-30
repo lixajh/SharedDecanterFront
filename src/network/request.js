@@ -34,9 +34,8 @@ service.interceptors.response.use(
   * resultCode为FAIL是抛错
   */
     const res = response.data
-    
 
-     if (code == 401) {
+     if (res.code == 401) {
       store.commit('SET_LOGIN_STATUS', -1)
       store.dispatch('FedLogOut').then(() => {
         location.reload()// 为了重新实例化vue-router对象 避免bug
