@@ -40,14 +40,7 @@ const user = {
     GetBasicInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getBasicInfo().then(response => {
-<<<<<<< HEAD
-          const data = response.data
-          var memberInfo = data
-          commit('SET_ROLES', 1)
-          commit('SET_LOGIN_STATUS', 1)
-          commit('SET_NAME', memberInfo.username)
-          // commit('SET_AVATAR', memberInfo.phone)
-=======
+
           const data = response.data.data
           var memberInfo = data
           // commit('SET_ROLES', data.roles)
@@ -55,7 +48,6 @@ const user = {
       
           commit('SET_NAME', memberInfo.username)
           commit('SET_AVATAR', memberInfo.username)
->>>>>>> 20526a15b6f1df6398971193e17c73f2ddcea479
           resolve(response)
         }).catch(error => {  
           reject(error)
