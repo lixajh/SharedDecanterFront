@@ -6,14 +6,14 @@
           {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column label="用户名">
+      <el-table-column label="用户昵称">
         <template slot-scope="scope">
-          {{scope.row.username}}
+          {{scope.row.nickname}}
         </template>
       </el-table-column>
-      <el-table-column label="手机号码" >
+      <el-table-column label="openId" >
         <template slot-scope="scope">
-          {{scope.row.phone}}
+          {{scope.row.openId}}
         </template>
       </el-table-column>
       <el-table-column label="最后登录时间" >
@@ -22,10 +22,10 @@
           <span>{{scope.row.lastLoginTime | formatDate}}</span>
         </template>
       </el-table-column>
-
-      <el-table-column class-name="status-col" label="审核状态" width="130" align="center">
+      <el-table-column label="注册时间" >
         <template slot-scope="scope">
-          <el-tag :type="scope.row.check_status | statusCssFilter">{{scope.row.check_status | statusFilter}}</el-tag>
+           <i class="el-icon-time"></i>
+          <span>{{scope.row.createTime | formatDate}}</span>
         </template>
       </el-table-column>
 
@@ -55,7 +55,7 @@
 
     <el-row :gutter="40">
       <el-col :span="12">
-        <el-form-item label="用户名：" :label-width="formLabelWidth" >
+        <el-form-item label="访客名称：" :label-width="formLabelWidth" >
           <el-input v-model="selectedRecord.visitor"  :readonly = isReadonly ></el-input>
         </el-form-item>
       </el-col>
@@ -65,14 +65,28 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-          <el-form-item label="创建时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.lastLoginTime"   :readonly = isReadonly></el-input>
+        <el-form-item label="证件类型：" :label-width="formLabelWidth" >
+          <el-select  v-model="selectedRecord.card_type" placeholder="证件类型" :disabled=isReadonly>
+            <el-option label="一代身份证" :value=1></el-option>
+            <el-option label="驾照" :value=2></el-option>
+            <el-option label="护照" :value=3></el-option>
+            <el-option label="二代身份证" :value=4></el-option>
+            <el-option label="护照机读码" :value=5></el-option>
+            <el-option label="台胞证" :value=6></el-option>
+            <el-option label="港澳通行证" :value=7></el-option>
+            <el-option label="其他" :value=8></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+          <el-form-item label="证件号码：" :label-width="formLabelWidth">
+            <el-input v-model="selectedRecord.idcard_no"   :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
 
       <el-col :span="12">
-          <el-form-item label="最后登录时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.createTime"  :readonly = isReadonly></el-input>
+          <el-form-item label="来访时间：" :label-width="formLabelWidth">
+            <el-input v-model="selectedRecord.start_date"  :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
 
@@ -81,6 +95,13 @@
             <el-input v-model="selectedRecord.end_date"  :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
+
+      <el-col :span="24">
+          <el-form-item label="来访事由：" :label-width="formLabelWidth" >
+            <el-input v-model="selectedRecord.reason"  :readonly = isReadonly type="textarea"></el-input>
+          </el-form-item>
+      </el-col>
+
       </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -94,7 +115,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getAdminList,checkVisitor,getVisitorDetail } from '@/api/admin'
+import { getMemberList,checkVisitor,getVisitorDetail } from '@/api/member'
 import { mapGetters } from 'vuex'
 export default {
   data() {
@@ -111,9 +132,6 @@ export default {
       selectedRecord:null,
       formLabelWidth: '90px',
       isReadonly:true,
-      cardType:{
-        1:''
-      }
      
     }
   },
@@ -165,7 +183,7 @@ export default {
         this.row_index = 0;
       }
       
-      getAdminList().then(response => {
+      getMemberList().then(response => {
         var data = response.data.data;
         var dataList = data.list;
         for (var i=0;i<dataList.length;i++){

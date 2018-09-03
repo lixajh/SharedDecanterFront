@@ -1,4 +1,5 @@
 <template>
+<div>
   <el-menu class="navbar" mode="horizontal">
     <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
     <breadcrumb></breadcrumb>
@@ -11,35 +12,42 @@
     {{ name}} <i class="el-icon-arrow-down el-icon--right"></i>
   </span>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
-        <!-- <router-link class="inlineBlock" to="/">
-          <el-dropdown-item>
-           {{ name }}
-          </el-dropdown-item>
-        </router-link> -->
-        <!-- <el-dropdown-item divided> -->
         <el-dropdown-item>
-          <span @click="dialogTableVisible = true" style="display:block;">切换运营商</span>
+          <span @click="showChangePwdDialog = true" style="display:block;">重置密码</span>
         </el-dropdown-item>
         <el-dropdown-item divided>
           <span @click="logout" style="display:block;">退出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-
-    <!-- <el-dialog title="切换运营商" :visible.sync="dialogTableVisible"  width='400px'>
-      <el-radio v-for="item in operators" :key="item.operatorId" v-model="defaultOperatorId" :label=item.operatorId >{{item.company_name}}</el-radio>
+ </el-menu>
+    <el-dialog title="修改密码" :visible.sync="showChangePwdDialog" width="600px">
+      <el-form ref="form" :model="changePwdModel"  label-width="130px" >
+        
+          <el-form-item prop="oldPwd" label="旧密码：" :rules="filter_rules({required:true,type:'mobile'})"  >
+            <el-input v-model="changePwdModel.oldPwd"  ></el-input>
+          </el-form-item>
+          <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,type:'mobile'})" >
+            <el-input v-model="changePwdModel.newPwd"   ></el-input>
+          </el-form-item>
+          <el-form-item prop="ensureNewPwd" label="确认新密码：" :rules="ensurePwdRules" >
+            <el-input v-model="changePwdModel.ensureNewPwd"   ></el-input>
+          </el-form-item>
+        
+      </el-form>
       <span slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="changeDefaultOp">确 定</el-button>
-  </span>
-</el-dialog> -->
-
-  </el-menu>
+        <el-button type="primary" @click="changePwd">确 定</el-button>
+      </span>
+</el-dialog>
+</div>
+ 
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { validatePwd } from '@/utils/validate'
 
 export default {
   components: {
@@ -47,25 +55,51 @@ export default {
     Hamburger
   },
   data(){
+     
+      var validateEnsurePwd = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== 'this.ruleForm2.pass') {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
+
+      var rules1 = this.filter_rules({required:true,type:'mobile'}).push( { validator: validateEnsurePwd, trigger: 'blur' });
     return {
-      dialogTableVisible:false,
+      //是否展示修改密码对话框
+      showChangePwdDialog:false,
+      //修改密码框数据
+      changePwdModel:{
+        oldPwd:'',
+        newPwd:'',
+        ensureNewPwd:''
+      },
+       ensurePwdRules: rules1,
+    
     }
   },
   created () {
-
-   
     this.$store.dispatch('GetBasicInfo');
   },
   computed: {
+    
     ...mapGetters([
       'sidebar',
       'avatar',
       'name',
       'default_operator_id'
     ]),
+  
+   
   },
   methods: {
+    
     toggleSideBar() {
+      this.$store.dispatch('ToggleSideBar')
+    },
+     changePwd() {
       this.$store.dispatch('ToggleSideBar')
     },
     logout() {

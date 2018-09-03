@@ -50,6 +50,12 @@ export const constantRouterMap = [
         component: () => import('@/views/admin/index'),
         meta: { title: '管理员管理', icon: 'peoples' }
       },
+      {
+        path: 'memberList',
+        name: 'MemberList',
+        component: () => import('@/views/member/index'),
+        meta: { title: '会员管理', icon: 'peoples' }
+      },
     ]
   }, 
   { path: '*', redirect: '/404', hidden: true }

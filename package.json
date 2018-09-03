@@ -17,7 +17,7 @@
     "axios": "0.17.1",
     "babel-polyfill": "^6.26.0",
     "core-js": "^2.5.5",
-    "element-ui": "2.3.6",
+    "element-ui": "2.4.6",
     "js-cookie": "2.2.0",
     "js-md5": "0.7.3",
     "normalize-wheel": "^1.0.1",

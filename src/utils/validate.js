@@ -37,3 +37,12 @@ export function isvalidPhone(str) {
   return reg.test(str)
 }
 
+export function validatePwd(rule, value, callback)  {
+  const reg = /^1\d{10}$/
+  if (reg.test(str)) {
+    callback()
+  } else {
+    callback(new Error('请输入正确'))
+  }
+}
+

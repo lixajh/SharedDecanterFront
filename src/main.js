@@ -15,11 +15,12 @@ import store from './store'
 import VueCookie from 'vue-cookie'
 import '@/icons' // icon
 import '@/permission' // permission control
-
+import Validate from './utils/validate1'
 // Tell Vue to use the plugin
 Vue.use(VueCookie);
 
-Vue.use(ElementUI, { locale })
+Vue.use(ElementUI, { locale });
+Vue.use(Validate);
 
 Vue.config.productionTip = false
 
