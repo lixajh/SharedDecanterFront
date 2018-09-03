@@ -24,10 +24,10 @@
     <el-dialog title="修改密码" :visible.sync="showChangePwdDialog" width="600px">
       <el-form ref="form" :model="changePwdModel"  label-width="130px" >
         
-          <el-form-item prop="oldPwd" label="旧密码：" :rules="filter_rules({required:true,type:'mobile'})"  >
+          <el-form-item prop="oldPwd" label="旧密码：" :rules="filter_rules({required:true,type:'password'})"  >
             <el-input v-model="changePwdModel.oldPwd"  ></el-input>
           </el-form-item>
-          <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,type:'mobile'})" >
+          <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,min:6,max:18,type:'password'})" >
             <el-input v-model="changePwdModel.newPwd"   ></el-input>
           </el-form-item>
           <el-form-item prop="ensureNewPwd" label="确认新密码：" :rules="ensurePwdRules" >
@@ -59,14 +59,16 @@ export default {
       var validateEnsurePwd = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请再次输入密码'));
-        } else if (value !== 'this.ruleForm2.pass') {
+        } else if (value !== this.changePwdModel.newPwd) {
           callback(new Error('两次输入密码不一致!'));
         } else {
           callback();
         }
       };
 
-      var rules1 = this.filter_rules({required:true,type:'mobile'}).push( { validator: validateEnsurePwd, trigger: 'blur' });
+      var customEnsurePwdRules = this.filter_rules({required:true,type:'mobile'});
+      customEnsurePwdRules.push( { validator: validateEnsurePwd, trigger: 'blur' });
+
     return {
       //是否展示修改密码对话框
       showChangePwdDialog:false,
@@ -76,7 +78,7 @@ export default {
         newPwd:'',
         ensureNewPwd:''
       },
-       ensurePwdRules: rules1,
+       ensurePwdRules: customEnsurePwdRules,
     
     }
   },

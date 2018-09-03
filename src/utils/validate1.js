@@ -42,21 +42,12 @@ export default{
             if(item.type){
                 let type = item.type;
                 switch(type) {
-                    // case 'email':
-                    //     rules.push({ type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change'  });
-                    //     break;
-                    // case 'qq':
-                    //     rules.push( { validator: isvalidateQQ, trigger: 'blur,change' });
-                    //     break;
+                    case 'email':
+                        rules.push({ type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change'  });
+                        break;
                     case 'mobile':
                         rules.push( { validator: isvalidateMobile, trigger: 'blur' });
                         break;    
-                    // case 'regexn':
-                    //     rules.push( { validator: isvalidateRegexn, trigger: 'blur,change' });
-                    //     break;    
-                    // case 'integer':
-                    //     rules.push( { validator: isvalidateInteger, trigger: 'blur,change' });
-                    //     break;        
                     default:
                         rule.push({});
                         break;
