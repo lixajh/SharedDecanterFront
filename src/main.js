@@ -15,7 +15,7 @@ import store from './store'
 import VueCookie from 'vue-cookie'
 import '@/icons' // icon
 import '@/permission' // permission control
-import Validate from './utils/validate1'
+import Validate from './utils/validate'
 // Tell Vue to use the plugin
 Vue.use(VueCookie);
 

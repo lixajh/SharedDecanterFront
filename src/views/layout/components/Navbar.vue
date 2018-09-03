@@ -22,16 +22,16 @@
     </el-dropdown>
  </el-menu>
     <el-dialog title="修改密码" :visible.sync="showChangePwdDialog" width="600px">
-      <el-form ref="form" :model="changePwdModel"  label-width="130px" >
+      <el-form ref="form"  label-width="130px" >
         
           <el-form-item prop="oldPwd" label="旧密码：" :rules="filter_rules({required:true,type:'password'})"  >
-            <el-input v-model="changePwdModel.oldPwd"  ></el-input>
+            <el-input v-model="changePwdModel.oldPwd"   ></el-input>
           </el-form-item>
           <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,min:6,max:18,type:'password'})" >
-            <el-input v-model="changePwdModel.newPwd"   ></el-input>
+            <el-input v-model="newPwd" ></el-input>
           </el-form-item>
           <el-form-item prop="ensureNewPwd" label="确认新密码：" :rules="ensurePwdRules" >
-            <el-input v-model="changePwdModel.ensureNewPwd"   ></el-input>
+            <el-input v-model="changePwdModel.ensureNewPwd"   @input="onEnsureNewPwdChange" ></el-input>
           </el-form-item>
         
       </el-form>
@@ -74,10 +74,11 @@ export default {
       showChangePwdDialog:false,
       //修改密码框数据
       changePwdModel:{
-        oldPwd:'',
-        newPwd:'',
-        ensureNewPwd:''
+        // oldPwd:'3sdf',
+        newPwd:'dfsf',
+        ensureNewPwd:'sdf'
       },
+      newPwd:'3sdf',
        ensurePwdRules: customEnsurePwdRules,
     
     }
@@ -86,22 +87,31 @@ export default {
     this.$store.dispatch('GetBasicInfo');
   },
   computed: {
-    
     ...mapGetters([
       'sidebar',
       'avatar',
       'name',
       'default_operator_id'
     ]),
-  
-   
   },
   methods: {
-    
     toggleSideBar() {
       this.$store.dispatch('ToggleSideBar')
     },
-     changePwd() {
+     onOldPwdChange() {
+      
+      this.changePwdModel.oldPwd = this.changePwdModel.oldPwd.replace(/[\W]/g,'')
+      console.log(this.changePwdModel.oldPwd)
+    },
+      onNewPwdChange(value) {
+        this.changePwdModel.newPwd = value
+      this.changePwdModel.newPwd = value.replace(/[\W]/g,'')
+      console.log( value + this.changePwdModel.newPwd)
+    },
+      onEnsureNewPwdChange(value) {
+      this.changePwdModel.ensureNewPwd = value.replace(/[\W]/g,'')
+    },
+    changePwd() {
       this.$store.dispatch('ToggleSideBar')
     },
     logout() {
@@ -109,7 +119,18 @@ export default {
         location.reload() // 为了重新实例化vue-router对象 避免bug
       })
     },
-  }
+    onPwdChange(value){
+      console.log(value)
+      value=value.replace(/[\W]/g,'')
+    },
+  },
+  watch:{
+    'newPwd': function(newVal,oldVal){
+      console.log(newVal)
+        this.newPwd = newVal.replace(/[\W]/g,'')
+        this.$forceUpdate();
+    }
+}
 }
 </script>
 
