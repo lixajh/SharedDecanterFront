@@ -1,6 +1,10 @@
 <template>
   <div class="app-container">
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
+    <el-input v-model="usernameSearch" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
+
+
+    <el-table class="table-frame" :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
           {{scope.$index+1}}
@@ -55,36 +59,31 @@
 
     <el-row :gutter="40">
       <el-col :span="12">
-        <el-form-item label="用户名：" :label-width="formLabelWidth" >
-          <el-input v-model="selectedRecord.visitor"  :readonly = isReadonly ></el-input>
+        <el-form-item label="用户名：" :label-width="formLabelWidth" prop="username"  :rules="filter_rules({required:true, min:3, max:10, type:'letterOrNumber'})"  >
+          <el-input  v-model="selectedRecord.username"  ></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="手机号码：" :label-width="formLabelWidth">
-          <el-input v-model="selectedRecord.phone"  :readonly = isReadonly></el-input>
+        <el-form-item label="手机号码：" :label-width="formLabelWidth" :rules="filter_rules({ type:'mobile'})">
+          <el-input v-model="selectedRecord.phone"  ></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
           <el-form-item label="创建时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.lastLoginTime"   :readonly = isReadonly></el-input>
+            <el-input :value="selectedRecord.createTime | formatDate"   :readonly = true></el-input>
           </el-form-item>
       </el-col>
 
       <el-col :span="12">
           <el-form-item label="最后登录时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.createTime"  :readonly = isReadonly></el-input>
+            <el-input :value="selectedRecord.lastLoginTime | formatDate"  :readonly = true></el-input>
           </el-form-item>
       </el-col>
-
-      <el-col :span="12">
-          <el-form-item label="结束时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.end_date"  :readonly = isReadonly></el-input>
-          </el-form-item>
-      </el-col>
+     
       </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <!-- <el-button @click="dialogDetailVisible = false">取 消</el-button> -->
+        <el-button @click="dialogDetailVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogDetailVisible = false">确 定</el-button>
       </div>
     </el-dialog>
@@ -94,33 +93,24 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getAdminList,checkVisitor,getVisitorDetail } from '@/api/admin'
+import { getAdminList,getAdminDetail } from '@/api/admin'
 import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
       list: null,
       listLoading: true,
-      start_date:'', 
-      end_date:'',
-      page_size:10,
-      row_index:0,
-      currentPage: 1,
-      totalSize: 1,
-      dialogDetailVisible:false,
-      selectedRecord:null,
+      page_size:10,   
+      currentPage: 1,    
       formLabelWidth: '90px',
-      isReadonly:true,
-      cardType:{
-        1:''
-      }
-     
+      usernameSearch:'',
+     selectedRecord:{
+       username:'',
+       phone:''
+     },
+     totalSize: 0,
+     dialogDetailVisible:false,
     }
-  },
-  computed: {
-    // ...mapGetters([
-    //     'default_operator_id'
-    //   ])
   },
   filters: {
     statusCssFilter:function(status) {
@@ -160,12 +150,7 @@ export default {
     fetchData() {
 
       this.listLoading = true
-      this.row_index = (this.currentPage-1)*this.page_size
-      if(this.row_index == null){
-        this.row_index = 0;
-      }
-      
-      getAdminList().then(response => {
+      getAdminList({"page":this.currentPage, "size":this.page_size,"username": this.usernameSearch}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
         for (var i=0;i<dataList.length;i++){
@@ -186,11 +171,9 @@ export default {
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      // getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
-      //   if(response.resultCode=='SUCCESS'){
-      //     this.selectedRecord=response.resultData;
-      //   }
-      // })
+      getAdminDetail(data.record_id).then(response => {
+          this.selectedRecord=response.data.data;
+      })
     },
 
     check(data,pass){
@@ -254,4 +237,10 @@ export default {
     left: 0;
     -webkit-transition: opacity .3s;
     transition: opacity .3s;}
+    .search-box{
+     width:200px;
+    }
+    .table-frame{
+      margin-top:20px
+    }
 </style>

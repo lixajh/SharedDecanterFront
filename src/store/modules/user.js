@@ -3,7 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
   state: {
-    login_status: 0,//0:位置 -1：未登录 1：登陆
+    login_status: 0,//0:未知 -1：未登录 1：登陆
     name: '',
     avatar: '',
   },
@@ -59,7 +59,6 @@ const user = {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_LOGIN_STATUS', -1)
-          commit('SET_ROLES', [])
           // removeToken()
           resolve()
         }).catch(error => {

@@ -9,21 +9,37 @@ export default{
      * 注意:  定义type 规则时 不用做非空验证 
      *        只需要传入 required:true 即可
      * */
-    /*保留两位小数*/
-    const isvalidateMobile = (rule, value, callback) => {
-        // alert(value)
-        // if(value != null && value != "") {
-        //     const reg = /^1\d{10}$/
-        //     if (!reg.test(str)) {
-        //     callback(new Error('请输入正确的数字，最多保留两位小数!'))
-        //     } else {
-        //         callback()
-        //     }
-        // }
-        // else{
+    /*必须为大小字母小写字母或数字*/
+    const isLetterOrNum = (rule, value, callback) => {
+        if(value != null && value != "") {
+            const reg = /^[A-Za-z0-9_]+$/
+            if (!reg.test(value)) {
+            callback(new Error('该字段必须为字母数字或下划线!'))
+            } else {
+                callback()
+            }
+        }
+        else{
             callback();
-        // }
-        // callback(new Error('请输入正确的数字，最多保留两位小数!'))
+        }
+        callback(new Error('该字段必须为字母数字或下划线!'))
+    }
+
+            
+    const isPhone = (rule, value, callback) => {
+        if(value != null && value != "") {
+           
+            const reg =  /^1\d{10}$/
+            if (!reg.test(value)) {
+            callback(new Error('请输入合法的手机号!'))
+            } else {
+                callback()
+            }
+        }
+        else{
+            callback();
+        }
+        callback(new Error('请输入合法的手机号!'))
     }
 
     
@@ -45,8 +61,11 @@ export default{
                     case 'email':
                         rules.push({ type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change'  });
                         break;
-                    case 'mobile':
-                        rules.push( { validator: isvalidateMobile, trigger: 'blur' });
+                    case 'letterOrNumber':
+                        rules.push( { validator: isLetterOrNum, trigger: 'blur' });
+                        break;    
+                    case '':
+                        rules.push( { validator: isPhone, trigger: 'blur' });
                         break;    
                     default:
                         rules.push({});
@@ -112,18 +131,5 @@ export default{
     }
     
 }
-    
-    
-    /**
-     * 参数 item 
-     * required true  必填项
-     * maxLength  字符串的最大长度
-     * min 和 max 必须同时给 min < max  type=number
-     * type 手机号 mobile
-     *      邮箱   email
-     *      网址   url 
-     *      各种自定义类型   定义在 src/utils/validate 中    持续添加中.......
-     * */
-    
    
     

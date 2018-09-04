@@ -69,7 +69,15 @@ service.interceptors.response.use(
         return Promise.reject('error')
         
       }
-
+      if (res.code == 500) { 
+        Message({
+          message: res.message,
+          type: 'error',
+          duration: 2 * 1000
+        })
+        return Promise.reject('error')
+        
+      }
       return Promise.resolve(response)
     
   },

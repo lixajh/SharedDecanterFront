@@ -7,9 +7,9 @@ export function post(url,data){
     return request({
       url: url,
       method: 'post',
-      data: 
+      data: qs.stringify(data)
       // qs.stringify({'params':JSON.stringify(data)})
-      qs.stringify({data})
+      
       
     })
   }

@@ -22,21 +22,21 @@
     </el-dropdown>
  </el-menu>
     <el-dialog title="修改密码" :visible.sync="showChangePwdDialog" width="600px">
-      <el-form ref="form"  label-width="130px" >
+      <el-form ref="form1" :model="changePwdModel" label-width="110px" >
         
-          <el-form-item prop="oldPwd" label="旧密码：" :rules="filter_rules({required:true,type:'password'})"  >
-            <el-input v-model="changePwdModel.oldPwd"   ></el-input>
+          <el-form-item prop="oldPwd" label="旧密码："  :rules="filter_rules({required:true,type:'letterOrNumber'})"  >
+            <el-input v-model="changePwdModel.oldPwd" type='password'  ></el-input>
           </el-form-item>
-          <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,min:6,max:18,type:'password'})" >
-            <el-input v-model="newPwd" ></el-input>
+          <el-form-item prop="newPwd" label="新密码：" :rules="filter_rules({required:true,min:6,max:18,type:'letterOrNumber'})" >
+            <el-input v-model="changePwdModel.newPwd" type='password' ></el-input>
           </el-form-item>
-          <el-form-item prop="ensureNewPwd" label="确认新密码：" :rules="ensurePwdRules" >
-            <el-input v-model="changePwdModel.ensureNewPwd"   @input="onEnsureNewPwdChange" ></el-input>
+          <el-form-item prop="ensureNewPwd" label="确认密码：" :rules="ensurePwdRules" >
+            <el-input v-model="changePwdModel.ensureNewPwd" type='password'></el-input>
           </el-form-item>
         
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="changePwd">确 定</el-button>
+        <el-button type="primary" @click="changePassword">确 定</el-button>
       </span>
 </el-dialog>
 </div>
@@ -48,6 +48,7 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import { validatePwd } from '@/utils/validate'
+import { changePwd } from '@/api/admin'
 
 export default {
   components: {
@@ -66,19 +67,15 @@ export default {
         }
       };
 
-      var customEnsurePwdRules = this.filter_rules({required:true,type:'mobile'});
-      customEnsurePwdRules.push( { validator: validateEnsurePwd, trigger: 'blur' });
-
     return {
       //是否展示修改密码对话框
       showChangePwdDialog:false,
       //修改密码框数据
       changePwdModel:{
-        // oldPwd:'3sdf',
-        newPwd:'dfsf',
-        ensureNewPwd:'sdf'
+        oldPwd:'',
+        newPwd:'',
+        ensureNewPwd:''
       },
-      newPwd:'3sdf',
        ensurePwdRules: customEnsurePwdRules,
     
     }
@@ -98,21 +95,31 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('ToggleSideBar')
     },
-     onOldPwdChange() {
+    changePassword() {
+      this.$refs.form1.validate(valid => {
+        if (valid) {
+          this.listLoading = true
+          changePwd(this.changePwdModel.oldPwd,this.changePwdModel.newPwd).then(response => {
+          if(response.data.code == 200){
+            this.showChangePwdDialog = false;
+            this.changePwdModel.newPwd = ''
+            this.changePwdModel.oldPwd = ''
+            this.changePwdModel.ensureNewPwd = ''
+            this.$message({
+              message: '修改成功',
+              type: 'success'
+            });
+          }
+        this.listLoading = false
+      }).catch(e => {
+        this.listLoading = false
+      })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
       
-      this.changePwdModel.oldPwd = this.changePwdModel.oldPwd.replace(/[\W]/g,'')
-      console.log(this.changePwdModel.oldPwd)
-    },
-      onNewPwdChange(value) {
-        this.changePwdModel.newPwd = value
-      this.changePwdModel.newPwd = value.replace(/[\W]/g,'')
-      console.log( value + this.changePwdModel.newPwd)
-    },
-      onEnsureNewPwdChange(value) {
-      this.changePwdModel.ensureNewPwd = value.replace(/[\W]/g,'')
-    },
-    changePwd() {
-      this.$store.dispatch('ToggleSideBar')
     },
     logout() {
       this.$store.dispatch('LogOut').then(() => {
@@ -124,13 +131,6 @@ export default {
       value=value.replace(/[\W]/g,'')
     },
   },
-  watch:{
-    'newPwd': function(newVal,oldVal){
-      console.log(newVal)
-        this.newPwd = newVal.replace(/[\W]/g,'')
-        this.$forceUpdate();
-    }
-}
 }
 </script>
 

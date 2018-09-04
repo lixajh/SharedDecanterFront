@@ -1,6 +1,6 @@
 import request from '@/network/request'
 import { post } from '@/network/post'
-
+import md5 from 'js-md5';
 // export function getList(params) {
 //   return request({
 //     url: '/table/list',
@@ -10,17 +10,15 @@ import { post } from '@/network/post'
 // }
 
 
-export function getAdminList() {
-
-  return post("/manager/admin/list",{})
+export function getAdminList(params) {
+  return post("/manager/admin/list",params)
 }
 
-export function checkVisitor(record_id,check_status,sys_id) {
-//check_status = 1: 通过 2：不通过
-  return post("/api/visitor/check",{'record_id':record_id, 'check_status':check_status, 'sys_id':sys_id})
+export function changePwd(oldPwd,newPwd) {
+  return post("/manager/admin/changePwd",{'oldPwd':md5(oldPwd), 'newPwd':md5(newPwd)})
 }
 
-export function getVisitorDetail(record_id,sys_id) {
-  //check_status = 1: 通过 2：不通过
-    return post("/api/visitor/getVisitDetail",{'record_id':record_id, 'sys_id':sys_id})
-  }
+export function getAdminDetail(id) {
+  return post("/manager/admin/detail",{'id':id})
+}
+
