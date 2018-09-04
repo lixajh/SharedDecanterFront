@@ -55,7 +55,7 @@
     </el-pagination>
 
     <el-dialog v-if="selectedRecord" title="详情" :visible.sync="dialogDetailVisible" width='800px'>
-      <el-form v-if="selectedRecord" :model="selectedRecord">
+      <el-form v-if="selectedRecord" ref="detail_form" :model="selectedRecord">
 
     <el-row :gutter="40">
       <el-col :span="12">
@@ -175,7 +175,32 @@ export default {
           this.selectedRecord=response.data.data;
       })
     },
-
+    edit(data){
+     
+     this.$refs.form1.validate(valid => {
+        if (valid) {
+          this.listLoading = true
+          adminEdit(this.selectedRecord).then(response => {
+          if(response.data.code == 200){
+            this.showChangePwdDialog = false;
+            this.changePwdModel.newPwd = '';
+            this.changePwdModel.oldPwd = '';
+            this.changePwdModel.ensureNewPwd = '';
+            this.$message({
+              message: '修改成功',
+              type: 'success'
+            });
+          }
+        this.listLoading = false
+      }).catch(e => {
+        this.listLoading = false
+      })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
     check(data,pass){
       if(data.passLoading||data.rejectLoading){
         return;
