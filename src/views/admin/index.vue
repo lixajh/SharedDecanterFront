@@ -35,7 +35,7 @@
 
       <el-table-column label="操作"  align="center" >
         <template slot-scope="scope">
-        <el-button @click="detail(scope.row)" type="text" size="small">查看</el-button>
+        <el-button @click="detail(scope.row)" type="text" size="small">编辑</el-button>
         
         <el-button @click="check(scope.row,true)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small" :loading="scope.row.passLoading">通过</el-button>
         <el-button @click="check(scope.row,false)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small"  :loading="scope.row.rejectLoading">拒绝</el-button>
@@ -64,7 +64,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="手机号码：" :label-width="formLabelWidth" :rules="filter_rules({ type:'mobile'})">
+        <el-form-item label="手机号码：" :label-width="formLabelWidth" prop="phone"  :rules="filter_rules({ type:'mobile'})">
           <el-input v-model="selectedRecord.phone"  ></el-input>
         </el-form-item>
       </el-col>
@@ -84,7 +84,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogDetailVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogDetailVisible = false">确 定</el-button>
+        <el-button type="primary" @click="edit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -93,7 +93,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getAdminList,getAdminDetail } from '@/api/admin'
+import { getAdminList,getAdminDetail,adminEdit } from '@/api/admin'
 import { mapGetters } from 'vuex'
 export default {
   data() {
@@ -171,21 +171,19 @@ export default {
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      getAdminDetail(data.record_id).then(response => {
+      getAdminDetail(data.pkId).then(response => {
           this.selectedRecord=response.data.data;
       })
     },
     edit(data){
      
-     this.$refs.form1.validate(valid => {
+     this.$refs.detail_form.validate(valid => {
         if (valid) {
           this.listLoading = true
           adminEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
-            this.showChangePwdDialog = false;
-            this.changePwdModel.newPwd = '';
-            this.changePwdModel.oldPwd = '';
-            this.changePwdModel.ensureNewPwd = '';
+            this.dialogDetailVisible = false;
+            this.fetchData();
             this.$message({
               message: '修改成功',
               type: 'success'
@@ -197,7 +195,6 @@ export default {
       })
         } else {
           console.log('error submit!!')
-          return false
         }
       })
     },

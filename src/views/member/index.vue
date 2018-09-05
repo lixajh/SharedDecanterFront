@@ -55,50 +55,31 @@
 
     <el-row :gutter="40">
       <el-col :span="12">
-        <el-form-item label="访客名称：" :label-width="formLabelWidth" >
-          <el-input v-model="selectedRecord.visitor"  :readonly = isReadonly ></el-input>
+        <el-form-item label="昵称：" :label-width="formLabelWidth" >
+          <el-input v-model="selectedRecord.nickname"  :readonly = isReadonly ></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="手机号码：" :label-width="formLabelWidth">
-          <el-input v-model="selectedRecord.phone"  :readonly = isReadonly></el-input>
+        <el-form-item label="openId：" :label-width="formLabelWidth">
+          <el-input v-model="selectedRecord.openId"  :readonly = isReadonly></el-input>
         </el-form-item>
       </el-col>
+
       <el-col :span="12">
-        <el-form-item label="证件类型：" :label-width="formLabelWidth" >
-          <el-select  v-model="selectedRecord.card_type" placeholder="证件类型" :disabled=isReadonly>
-            <el-option label="一代身份证" :value=1></el-option>
-            <el-option label="驾照" :value=2></el-option>
-            <el-option label="护照" :value=3></el-option>
-            <el-option label="二代身份证" :value=4></el-option>
-            <el-option label="护照机读码" :value=5></el-option>
-            <el-option label="台胞证" :value=6></el-option>
-            <el-option label="港澳通行证" :value=7></el-option>
-            <el-option label="其他" :value=8></el-option>
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-          <el-form-item label="证件号码：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.idcard_no"   :readonly = isReadonly></el-input>
+          <el-form-item label="注册时间：" :label-width="formLabelWidth">
+            <el-input :value="selectedRecord.createTime | formatDate"  :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
 
       <el-col :span="12">
-          <el-form-item label="来访时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.start_date"  :readonly = isReadonly></el-input>
+          <el-form-item label="最后登录：" :label-width="formLabelWidth">
+            <el-input :value="selectedRecord.lastLoginTime | formatDate"  :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
 
       <el-col :span="12">
-          <el-form-item label="结束时间：" :label-width="formLabelWidth">
-            <el-input v-model="selectedRecord.end_date"  :readonly = isReadonly></el-input>
-          </el-form-item>
-      </el-col>
-
-      <el-col :span="24">
-          <el-form-item label="来访事由：" :label-width="formLabelWidth" >
-            <el-input v-model="selectedRecord.reason"  :readonly = isReadonly type="textarea"></el-input>
+          <el-form-item label="地区：" :label-width="formLabelWidth" >
+            <el-input v-model="selectedRecord.address"  :readonly = isReadonly></el-input>
           </el-form-item>
       </el-col>
 
@@ -115,17 +96,14 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getMemberList,checkVisitor,getVisitorDetail } from '@/api/member'
+import { getMemberList,getMemberDetail} from '@/api/member'
 import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
       list: null,
       listLoading: true,
-      start_date:'', 
-      end_date:'',
       page_size:10,
-      row_index:0,
       currentPage: 1,
       totalSize: 1,
       dialogDetailVisible:false,
@@ -141,30 +119,10 @@ export default {
     //   ])
   },
   filters: {
-    statusCssFilter:function(status) {
-      const statusCssMap = {
-        0: 'danger',
-        1: 'success',
-        2: 'danger',
-        3: 'warning',
-        4: 'gray'
-      }
-      return statusCssMap[status]
-    },
-
-    statusFilter:function(status) {
-      const statusMap = {
-        0: '待审核',
-        1: '通过',
-        2: '拒绝',
-        3: '待审核',//等待被访人审核
-        4: '待管理员审核'
-      }
-      return statusMap[status]
-    },
+    
       formatDate(time) {
           var date = new Date(time);
-          return formatDate(date, 'yyyy-MM-dd hh:mm');
+          return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
       },
   },
 
@@ -178,18 +136,10 @@ export default {
     fetchData() {
 
       this.listLoading = true
-      this.row_index = (this.currentPage-1)*this.page_size
-      if(this.row_index == null){
-        this.row_index = 0;
-      }
       
-      getMemberList().then(response => {
+      getMemberList({"page":this.currentPage, "size":this.page_size}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
-        for (var i=0;i<dataList.length;i++){
-          dataList[i].passLoading=false;
-          dataList[i].rejectLoading=false;
-        }
         this.list = dataList;
         this.listLoading = false;
         this.currentPage = data.pageNum;
@@ -204,11 +154,11 @@ export default {
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      // getVisitorDetail(data.record_id,this.default_operator_id).then(response => {
-      //   if(response.resultCode=='SUCCESS'){
-      //     this.selectedRecord=response.resultData;
-      //   }
-      // })
+      getMemberDetail(data.pkId).then(response => {
+        
+          this.selectedRecord=response.data.data;
+       
+      })
     },
 
     check(data,pass){

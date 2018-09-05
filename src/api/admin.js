@@ -22,3 +22,11 @@ export function getAdminDetail(id) {
   return post("/manager/admin/detail",{'id':id})
 }
 
+export function adminEdit(obj) {
+  var params = {}
+  params.username = obj.username;
+  params.phone = obj.phone;
+  params.pkId = obj.pkId;
+  return post("/manager/admin/update",params)
+}
+

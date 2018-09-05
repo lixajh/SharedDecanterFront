@@ -76,8 +76,9 @@ export default {
         newPwd:'',
         ensureNewPwd:''
       },
-       ensurePwdRules: customEnsurePwdRules,
-    
+       ensurePwdRules: [
+            { validator: validateEnsurePwd, trigger: 'blur' }
+          ],
     }
   },
   created () {

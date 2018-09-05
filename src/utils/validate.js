@@ -27,6 +27,7 @@ export default{
 
             
     const isPhone = (rule, value, callback) => {
+        console.log("isphone")
         if(value != null && value != "") {
            
             const reg =  /^1\d{10}$/
@@ -64,7 +65,7 @@ export default{
                     case 'letterOrNumber':
                         rules.push( { validator: isLetterOrNum, trigger: 'blur' });
                         break;    
-                    case '':
+                    case 'mobile':
                         rules.push( { validator: isPhone, trigger: 'blur' });
                         break;    
                     default:

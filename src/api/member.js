@@ -10,13 +10,13 @@ import { post } from '@/network/post'
 // }
 
 
-export function getMemberList() {
+export function getMemberList(params) {
 
-  return post("/manager/member/list",{})
+  return post("/manager/member/list",params)
 }
 
-export function checkVisitor(record_id,check_status,sys_id) {
+export function getMemberDetail(id) {
 //check_status = 1: 通过 2：不通过
-  return post("/api/visitor/check",{'record_id':record_id, 'check_status':check_status, 'sys_id':sys_id})
+  return post("/manager/member/detail",{'id':id})
 }
 
