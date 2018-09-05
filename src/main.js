@@ -8,7 +8,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import locale from 'element-ui/lib/locale/lang/zh-CN'
 
 import '@/styles/index.scss' // global css
-
+import '@/styles/main-table.css' // global css
 import App from './App'
 import router from './router'
 import store from './store'

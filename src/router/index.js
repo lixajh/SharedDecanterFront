@@ -38,9 +38,9 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/manager',
+    path: '/admin',
     component: Layout,
-    redirect: 'adminList',
+    redirect: '/admin/adminList',
     name: 'Admin',
     meta: { title: '管理员', icon: 'example' },
     children: [
@@ -48,7 +48,7 @@ export const constantRouterMap = [
         path: 'adminList',
         name: 'AdminList',
         component: () => import('@/views/admin/index'),
-        meta: { title: '管理员管理', icon: 'peoples' }
+        meta: { title: '管理员列表', icon: 'peoples' }
       },
       {
         path: 'memberList',
@@ -58,6 +58,22 @@ export const constantRouterMap = [
       },
     ]
   }, 
+{
+  path: '/device',
+    component: Layout,
+    redirect: 'deviceList',
+    name: 'Device',
+    meta: { title: '设备管理', icon: 'example' },
+    children: [
+      {
+        path: 'deviceList',
+        name: 'AdminList',
+        component: () => import('@/views/device/index'),
+        meta: { title: '设备列表', icon: 'peoples' }
+      }
+    ]
+  }, 
+
   { path: '*', redirect: '/404', hidden: true }
 ]
 

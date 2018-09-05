@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
-
-     <!-- 搜索框 -->
-    <el-input v-model="nicknameSearch" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <!-- 搜索框 -->
+    <el-input v-model="search.name" placeholder="名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="action='add';">增加</el-button>
+      
 
     <!-- 表格区域 -->
-
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
@@ -57,8 +57,8 @@
       :total="totalSize">
     </el-pagination>
 
-    <el-dialog v-if="selectedRecord" title="详情" :visible.sync="dialogDetailVisible" width='800px'>
-      <el-form v-if="selectedRecord" :model="selectedRecord">
+    <el-dialog v-if="action=='add' || action=='edit'" title="详情" :visible.sync="action" width='800px'>
+      <el-form :model="selectedRecord">
 
     <el-row :gutter="40">
       <el-col :span="12">
@@ -103,7 +103,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getMemberList,getMemberDetail} from '@/api/member'
+import { getDeviceList,getDeviceDetail} from '@/api/device'
 import { mapGetters } from 'vuex'
 export default {
   data() {
@@ -117,7 +117,10 @@ export default {
       selectedRecord:null,
       formLabelWidth: '90px',
       isReadonly:true,
-     
+      search:{
+        name:""
+      },
+      action:""
     }
   },
   computed: {
@@ -144,7 +147,7 @@ export default {
 
       this.listLoading = true
       
-      getMemberList({"page":this.currentPage, "size":this.page_size}).then(response => {
+      getDeviceList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
         this.list = dataList;
@@ -161,7 +164,18 @@ export default {
      
       this.selectedRecord=data;
       this.dialogDetailVisible = true;
-      getMemberDetail(data.pkId).then(response => {
+      getDeviceDetail(data.pkId).then(response => {
+        
+          this.selectedRecord=response.data.data;
+       
+      })
+    },
+
+    add(data){
+     
+      this.selectedRecord=data;
+      this.dialogDetailVisible = true;
+      getDeviceDetail(data.pkId).then(response => {
         
           this.selectedRecord=response.data.data;
        

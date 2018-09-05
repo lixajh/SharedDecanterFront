@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
+    <!-- 搜索框 -->
     <el-input v-model="usernameSearch" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
 
-
+    <!-- 表格区域 -->
     <el-table class="table-frame" :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
@@ -91,6 +92,7 @@
 </template>
 
 <script>
+
 
 import {formatDate} from '@/utils/date.js';
 import { getAdminList,getAdminDetail,adminEdit } from '@/api/admin'
@@ -259,10 +261,5 @@ export default {
     left: 0;
     -webkit-transition: opacity .3s;
     transition: opacity .3s;}
-    .search-box{
-     width:200px;
-    }
-    .table-frame{
-      margin-top:20px
-    }
+    
 </style>
