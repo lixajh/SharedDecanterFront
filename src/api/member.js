@@ -1,14 +1,4 @@
-import request from '@/network/request'
 import { post } from '@/network/post'
-
-// export function getList(params) {
-//   return request({
-//     url: '/table/list',
-//     method: 'get',
-//     params
-//   })
-// }
-
 
 export function getMemberList(params) {
 

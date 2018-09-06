@@ -1,14 +1,5 @@
-import request from '@/network/request'
 import { post } from '@/network/post'
 import md5 from 'js-md5';
-// export function getList(params) {
-//   return request({
-//     url: '/table/list',
-//     method: 'get',
-//     params
-//   })
-// }
-
 
 export function getAdminList(params) {
   return post("/manager/admin/list",params)
@@ -29,4 +20,3 @@ export function adminEdit(obj) {
   params.pkId = obj.pkId;
   return post("/manager/admin/update",params)
 }
-

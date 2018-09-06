@@ -28,7 +28,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/manager/adminList',
+    redirect: '/admin/adminList',
     name: 'Index',
     hidden: true,
     // children: [{

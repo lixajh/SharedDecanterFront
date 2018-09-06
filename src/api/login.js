@@ -1,17 +1,5 @@
-import request from '@/network/request'
 import { post ,postWithoutCookie} from '@/network/post'
 import md5 from 'js-md5';
-
-// export function login(username, password) {
-//   return request({
-//     url: '/user/login',
-//     method: 'post',
-//     data: {
-//       username,
-//       password
-//     }
-//   })
-// }
 
 export function login(username, password) {
 
@@ -27,8 +15,4 @@ export function getBasicInfo() {
 
 export function logout() {
   return post("/manager/admin/logout",null)
-  // return request({
-  //   url: '/user/logout',
-  //   method: 'post'
-  // })
 }

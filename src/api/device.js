@@ -1,4 +1,3 @@
-import request from '@/network/request'
 import { post } from '@/network/post'
 
 export function getDeviceList(obj) {

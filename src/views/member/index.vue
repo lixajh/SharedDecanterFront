@@ -2,7 +2,7 @@
   <div class="app-container">
 
      <!-- 搜索框 -->
-    <el-input v-model="nicknameSearch" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.nickname" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
 
     <!-- 表格区域 -->
@@ -117,6 +117,9 @@ export default {
       selectedRecord:null,
       formLabelWidth: '90px',
       isReadonly:true,
+      search:{
+        nickname:""
+      },
      
     }
   },

@@ -9,9 +9,8 @@
 
     <!-- 表格区域 -->
     <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
-    <el-table-column
-      type="selection"
-      width="55">
+    <!-- 勾选框 -->
+    <el-table-column type="selection" width="55">
     </el-table-column>
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
@@ -42,11 +41,9 @@
       
       <el-table-column label="操作"  align="center" >
         <template slot-scope="scope">
-        <el-button @click="detail(scope.row)" type="text" size="small">查看</el-button>
-        
-        <el-button @click="check(scope.row,true)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small" :loading="scope.row.passLoading">通过</el-button>
-        <el-button @click="check(scope.row,false)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small"  :loading="scope.row.rejectLoading">拒绝</el-button>
-      </template>
+          <el-button @click="detail(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button @click="deleteRecord(scope.row)"  type="text" size="small" :loading="scope.row.deleteLoading">删除</el-button>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -134,21 +131,22 @@ export default {
     }
   },
   computed: {
-   isEdit:function(){
+
+    isEdit:function(){
       return this.action=='edit'
     },
-     dialogDetailVisible:{
-       get:function(){
-          return this.action != null;
-       },
-       set:function(a){
-         console.log('a'+a)
-        this.action = '';
-       },
-     }
+
+    dialogDetailVisible:{
+      get:function(){
+        return this.action != null;
+      },
+      set:function(a){
+          console.log('a'+a)
+          this.action = '';
+      },
+    }
   },
   filters: {
-    
       formatDate(time) {
           var date = new Date(time);
           return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
@@ -156,16 +154,14 @@ export default {
   },
 
   created() {
-
     this.page_size = localStorage.getItem('page_size')!=null ?   new Number(localStorage.getItem('page_size')) : 10;
     this.fetchData()
   },
 
   methods: {
+    //获取列表
     fetchData() {
-
       this.listLoading = true
-      
       getDeviceList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
@@ -175,30 +171,30 @@ export default {
         this.totalSize = data.total;
         this.page_size = data.pageSize;
       }).catch(e => {
-        this.listLoading = false
+        this.listLoading = false;
       })
     },
-
+//新增前清空实体
     toAdd(){
       this.action='add';
-      this.selectedRecord = {}
+      this.selectedRecord = {};
     },
-
+//获取详情
     detail(data){
      
       this.selectedRecord=data;
-      this.action='edit'
+      this.action='edit';
       getDeviceDetail(data.pkId).then(response => {
         
           this.selectedRecord=response.data.data;
        
       })
     },
-
+//新增或编辑（根据有没有pkId来判断）
     addOrEdit(data){
      this.$refs.edit_form.validate(valid => {
         if (valid) {
-          this.listLoading = true
+          this.listLoading = true;
           addOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
             this.dialogDetailVisible = false;
@@ -208,35 +204,50 @@ export default {
               type: 'success'
             });
           }
-        this.listLoading = false
+        this.listLoading = false;
       }).catch(e => {
-        this.listLoading = false
+        this.listLoading = false;
       })
         } else {
-          console.log('error submit!!')
+          console.log('error submit!!');
         }
       })
     },
+//删除
+  deleteRecord(data){
+    data.deleteLoading = true;
+    deleteDevices([data.pkId]).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
 
+        data.deleteLoading = false;
+        this.fetchData();
+      }).catch(e => {
+         data.deleteLoading = false;
+      })
+  },
+//批量删除
     batchDelete(){
         var seletedIds = this._.map(this.multipleSelection, 'pkId');
-        this.listLoading = true
+        this.listLoading = true;
         deleteDevices(seletedIds).then(response => {
           this.$message({
               message: '操作成功',
               type: 'success'
             });
 
-        this.listLoading = false
+        this.listLoading = false;
         this.fetchData();
       }).catch(e => {
-        this.listLoading = false
+        this.listLoading = false;
       })
     },
 
      handleSizeChange(val) {
        //页面size发生变化
-       localStorage.setItem('page_size',val)
+       localStorage.setItem('page_size',val);
         this.page_size = val;
         this.fetchData();
         
