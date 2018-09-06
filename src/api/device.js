@@ -1,15 +1,6 @@
 import request from '@/network/request'
 import { post } from '@/network/post'
 
-// export function getList(params) {
-//   return request({
-//     url: '/table/list',
-//     method: 'get',
-//     params
-//   })
-// }
-
-
 export function getDeviceList(obj) {
   var params = obj.search;
   params.page = obj.page;
@@ -18,7 +9,20 @@ export function getDeviceList(obj) {
 }
 
 export function getDeviceDetail(id) {
-//check_status = 1: 通过 2：不通过
+ 
   return post("/manager/device/detail",{'id':id})
+}
+
+export function addOrEdit(obj) {
+  if(obj.pkId){
+    return post("/manager/device/update",obj)
+  }else{
+    return post("/manager/device/add",obj)
+  }
+}
+
+export function deleteDevices(ids) {
+ 
+  return post("/manager/device/delete",{'ids':ids.join()})
 }
 

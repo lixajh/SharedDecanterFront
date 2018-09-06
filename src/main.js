@@ -16,11 +16,15 @@ import VueCookie from 'vue-cookie'
 import '@/icons' // icon
 import '@/permission' // permission control
 import Validate from './utils/validate'
+import VueLodash from './utils/vue-lodash'
 // Tell Vue to use the plugin
 Vue.use(VueCookie);
 
 Vue.use(ElementUI, { locale });
 Vue.use(Validate);
+
+const options = {}
+Vue.use(VueLodash, options) 
 
 Vue.config.productionTip = false
 

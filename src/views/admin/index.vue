@@ -177,7 +177,7 @@ export default {
           this.selectedRecord=response.data.data;
       })
     },
-    edit(data){
+    edit(){
      
      this.$refs.detail_form.validate(valid => {
         if (valid) {

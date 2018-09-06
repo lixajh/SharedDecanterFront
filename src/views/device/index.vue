@@ -3,39 +3,43 @@
     <!-- 搜索框 -->
     <el-input v-model="search.name" placeholder="名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
-    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="action='add';">增加</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
       
 
     <!-- 表格区域 -->
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
+    <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
+    <el-table-column
+      type="selection"
+      width="55">
+    </el-table-column>
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
           {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column label="用户昵称">
+      <el-table-column label="名称">
         <template slot-scope="scope">
-          {{scope.row.nickname}}
+          {{scope.row.name}}
         </template>
       </el-table-column>
-      <el-table-column label="openId" >
+      <el-table-column label="code" >
         <template slot-scope="scope">
-          {{scope.row.openId}}
+          {{scope.row.code}}
         </template>
       </el-table-column>
-      <el-table-column label="最后登录时间" >
+      <el-table-column label="状态" >
         <template slot-scope="scope">
-           <i class="el-icon-time"></i>
-          <span>{{scope.row.lastLoginTime | formatDate}}</span>
+          {{scope.row.online}}
         </template>
       </el-table-column>
-      <el-table-column label="注册时间" >
+      <el-table-column label="创建时间" >
         <template slot-scope="scope">
            <i class="el-icon-time"></i>
           <span>{{scope.row.createTime | formatDate}}</span>
         </template>
       </el-table-column>
-
+      
       <el-table-column label="操作"  align="center" >
         <template slot-scope="scope">
         <el-button @click="detail(scope.row)" type="text" size="small">查看</el-button>
@@ -44,10 +48,9 @@
         <el-button @click="check(scope.row,false)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small"  :loading="scope.row.rejectLoading">拒绝</el-button>
       </template>
       </el-table-column>
-
     </el-table>
 
-     <el-pagination class="page_right"
+    <el-pagination class="page_right"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
@@ -57,44 +60,53 @@
       :total="totalSize">
     </el-pagination>
 
-    <el-dialog v-if="action=='add' || action=='edit'" title="详情" :visible.sync="action" width='800px'>
-      <el-form :model="selectedRecord">
-
-    <el-row :gutter="40">
-      <el-col :span="12">
-        <el-form-item label="昵称：" :label-width="formLabelWidth" >
-          <el-input v-model="selectedRecord.nickname"  :readonly = isReadonly ></el-input>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="openId：" :label-width="formLabelWidth">
-          <el-input v-model="selectedRecord.openId"  :readonly = isReadonly></el-input>
-        </el-form-item>
-      </el-col>
-
-      <el-col :span="12">
-          <el-form-item label="注册时间：" :label-width="formLabelWidth">
-            <el-input :value="selectedRecord.createTime | formatDate"  :readonly = isReadonly></el-input>
+  <el-dialog v-if="action=='add' || action=='edit'" :title="action == 'add'?'增加':'编辑'" :visible.sync="dialogDetailVisible" width='800px'>
+    <el-form ref="edit_form"  :model="selectedRecord">
+      <el-row :gutter="40">
+        <el-col :span="12">
+          <el-form-item label="名称：" :label-width="formLabelWidth" prop="name"  :rules="filter_rules({required:true, min:3, max:10})"  >
+            <el-input v-model="selectedRecord.name"></el-input>
+          </el-form-item>  
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="code：" :label-width="formLabelWidth" prop="code"  :rules="filter_rules({max:20})"  >
+            <el-input v-model="selectedRecord.code"  :readonly = isEdit></el-input>
           </el-form-item>
-      </el-col>
-
-      <el-col :span="12">
-          <el-form-item label="最后登录：" :label-width="formLabelWidth">
-            <el-input :value="selectedRecord.lastLoginTime | formatDate"  :readonly = isReadonly></el-input>
+        </el-col>
+         <el-col :span="12" v-if="isEdit">
+          <el-form-item label="状态：" :label-width="formLabelWidth" >
+            <el-input v-model="selectedRecord.online"  :readonly = isEdit></el-input>
           </el-form-item>
-      </el-col>
-
-      <el-col :span="12">
-          <el-form-item label="地区：" :label-width="formLabelWidth" >
-            <el-input v-model="selectedRecord.address"  :readonly = isReadonly></el-input>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="地址：" :label-width="formLabelWidth" prop="code"  :rules="filter_rules({ max:100})" >
+            <el-input v-model="selectedRecord.address" ></el-input>
           </el-form-item>
-      </el-col>
+        </el-col>
+
+        <el-col :span="12" v-if="isEdit">
+            <el-form-item label="离线时间：" :label-width="formLabelWidth">
+              <el-input :value="selectedRecord.offlineTime | formatDate"  :readonly = isEdit></el-input>
+            </el-form-item>
+        </el-col>
+
+        <el-col :span="12" v-if="isEdit">
+            <el-form-item label="创建时间：" :label-width="formLabelWidth">
+              <el-input :value="selectedRecord.createTime | formatDate"  :readonly = isEdit></el-input>
+            </el-form-item>
+        </el-col>
+
+        <el-col :span="24">
+            <el-form-item label="备注：" :label-width="formLabelWidth" >
+              <el-input v-model="selectedRecord.remark"  type="textarea" ></el-input>
+            </el-form-item>
+        </el-col>
 
       </el-row>
-      </el-form>
+    </el-form>
       <div slot="footer" class="dialog-footer">
-        <!-- <el-button @click="dialogDetailVisible = false">取 消</el-button> -->
-        <el-button type="primary" @click="dialogDetailVisible = false">确 定</el-button>
+        <el-button @click="action = ''">取 消</el-button>
+          <el-button type="primary" @click="addOrEdit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -103,8 +115,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { getDeviceList,getDeviceDetail} from '@/api/device'
-import { mapGetters } from 'vuex'
+import { addOrEdit,getDeviceList,getDeviceDetail,deleteDevices} from '@/api/device'
 export default {
   data() {
     return {
@@ -113,10 +124,9 @@ export default {
       page_size:10,
       currentPage: 1,
       totalSize: 1,
-      dialogDetailVisible:false,
-      selectedRecord:null,
+      selectedRecord:{},
       formLabelWidth: '90px',
-      isReadonly:true,
+      multipleSelection:false,
       search:{
         name:""
       },
@@ -124,9 +134,18 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters([
-    //     'default_operator_id'
-    //   ])
+   isEdit:function(){
+      return this.action=='edit'
+    },
+     dialogDetailVisible:{
+       get:function(){
+          return this.action != null;
+       },
+       set:function(a){
+         console.log('a'+a)
+        this.action = '';
+       },
+     }
   },
   filters: {
     
@@ -160,10 +179,15 @@ export default {
       })
     },
 
+    toAdd(){
+      this.action='add';
+      this.selectedRecord = {}
+    },
+
     detail(data){
      
       this.selectedRecord=data;
-      this.dialogDetailVisible = true;
+      this.action='edit'
       getDeviceDetail(data.pkId).then(response => {
         
           this.selectedRecord=response.data.data;
@@ -171,59 +195,62 @@ export default {
       })
     },
 
-    add(data){
-     
-      this.selectedRecord=data;
-      this.dialogDetailVisible = true;
-      getDeviceDetail(data.pkId).then(response => {
-        
-          this.selectedRecord=response.data.data;
-       
+    addOrEdit(data){
+     this.$refs.edit_form.validate(valid => {
+        if (valid) {
+          this.listLoading = true
+          addOrEdit(this.selectedRecord).then(response => {
+          if(response.data.code == 200){
+            this.dialogDetailVisible = false;
+            this.fetchData();
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+          }
+        this.listLoading = false
+      }).catch(e => {
+        this.listLoading = false
+      })
+        } else {
+          console.log('error submit!!')
+        }
       })
     },
 
-    check(data,pass){
-      if(data.passLoading||data.rejectLoading){
-        return;
-      }
-      //check_status = 1: 通过 2：不通过
-      var check_status=2
-      if(pass){
-        data.passLoading=true;
-        check_status = 1
-      }else{
-        data.rejectLoading=true;
-      }
-      // checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
-      //     data.passLoading=false;
-      //     data.rejectLoading=false;
-      //   if(response.resultCode=='SUCCESS'){
-      //     this.fetchData()
-      //   }
-      // }).catch(e =>{
-      //     data.passLoading=false;
-      //     data.rejectLoading=false;
-      // })
+    batchDelete(){
+        var seletedIds = this._.map(this.multipleSelection, 'pkId');
+        this.listLoading = true
+        deleteDevices(seletedIds).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        this.listLoading = false
+        this.fetchData();
+      }).catch(e => {
+        this.listLoading = false
+      })
     },
+
      handleSizeChange(val) {
+       //页面size发生变化
        localStorage.setItem('page_size',val)
         this.page_size = val;
         this.fetchData();
         
       },
       handleCurrentChange(val) {
-        
+        //翻页
         this.currentPage = val;
         this.fetchData();
+      },
+       handleSelectionChange(val) {
+         //多选发生变化
+        this.multipleSelection = val;
       }
 
-  },
-  watch: {
-    // 如果 `question` 发生改变，这个函数就会运行
-    // default_operator_id: function (after, before) {
-    //   this.answer = 'Waiting for you to stop typing...:'+after
-    //   this.fetchData();
-    // },
   }
 }
 </script>
