@@ -73,6 +73,11 @@
       </el-col>
 
       <el-col :span="12">
+          <el-form-item label="性别" :label-width="formLabelWidth" >
+            <el-input :value="selectedRecord.sex | sexFilter"  :readonly = isReadonly></el-input>
+          </el-form-item>
+      </el-col>
+      <el-col :span="12">
           <el-form-item label="注册时间：" :label-width="formLabelWidth">
             <el-input :value="selectedRecord.createTime | formatDate"  :readonly = isReadonly></el-input>
           </el-form-item>
@@ -134,6 +139,17 @@ export default {
           var date = new Date(time);
           return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
       },
+       sexFilter:function(index) {
+        const sexMap = {
+          0: '未知',
+          1: '男',
+          2: '女',
+        }
+         if(index > 2){
+           return sexMap[0]
+         }
+        return sexMap[index]
+       }
   },
 
   created() {

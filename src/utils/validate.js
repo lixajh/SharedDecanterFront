@@ -27,7 +27,6 @@ export default{
 
             
     const isPhone = (rule, value, callback) => {
-        console.log("isphone")
         if(value != null && value != "") {
            
             const reg =  /^1\d{10}$/

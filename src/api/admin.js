@@ -13,10 +13,18 @@ export function getAdminDetail(id) {
   return post("/manager/admin/detail",{'id':id})
 }
 
-export function adminEdit(obj) {
+export function adminAddOrEdit(obj) {
   var params = {}
-  params.username = obj.username;
-  params.phone = obj.phone;
-  params.pkId = obj.pkId;
-  return post("/manager/admin/update",params)
+  if(obj.pkId){
+    params.username = obj.username;
+    params.phone = obj.phone;
+    params.pkId = obj.pkId;
+    return post("/manager/admin/update",params)
+  }else{
+    return post("/manager/admin/add",obj)
+  }
 }
+  export function deleteAdmins(ids) {
+ 
+    return post("/manager/admin/delete",{'ids':ids.join()})
+  }

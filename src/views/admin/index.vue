@@ -1,11 +1,16 @@
 <template>
   <div class="app-container">
     <!-- 搜索框 -->
-    <el-input v-model="usernameSearch" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.username" placeholder="按用户名搜索" class="search-box" @keyup.enter.native="fetchData"></el-input>
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
-
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
     <!-- 表格区域 -->
-    <el-table class="table-frame" :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row>
+    <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
+   
+    <!-- 勾选框 -->
+    <el-table-column type="selection" width="55"></el-table-column>
+
       <el-table-column align="center" label='序号' width="95">
         <template slot-scope="scope">
           {{scope.$index+1}}
@@ -21,25 +26,18 @@
           {{scope.row.phone}}
         </template>
       </el-table-column>
-      <el-table-column label="最后登录时间" >
+      <el-table-column  label="最后登录时间" >
         <template slot-scope="scope">
            <i class="el-icon-time"></i>
           <span>{{scope.row.lastLoginTime | formatDate}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column class-name="status-col" label="审核状态" width="130" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.check_status | statusCssFilter">{{scope.row.check_status | statusFilter}}</el-tag>
-        </template>
-      </el-table-column>
-
       <el-table-column label="操作"  align="center" >
         <template slot-scope="scope">
         <el-button @click="detail(scope.row)" type="text" size="small">编辑</el-button>
-        
-        <el-button @click="check(scope.row,true)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small" :loading="scope.row.passLoading">通过</el-button>
-        <el-button @click="check(scope.row,false)" v-if="scope.row.check_status == 0 || scope.row.check_status == 3" type="text" size="small"  :loading="scope.row.rejectLoading">拒绝</el-button>
+        <el-button @click="deleteRecord(scope.row)"  type="text" size="small" :loading="scope.row.deleteLoading">删除</el-button>
+       
       </template>
       </el-table-column>
 
@@ -55,8 +53,8 @@
       :total="totalSize">
     </el-pagination>
 
-    <el-dialog v-if="selectedRecord" title="详情" :visible.sync="dialogDetailVisible" width='800px'>
-      <el-form v-if="selectedRecord" ref="detail_form" :model="selectedRecord">
+    <el-dialog v-if="action=='add' || action=='edit'" :title="action == 'add'?'增加':'编辑'" :visible.sync="dialogDetailVisible" width='800px'>
+      <el-form v-if="selectedRecord" ref="edit_form" :model="selectedRecord">
 
     <el-row :gutter="40">
       <el-col :span="12">
@@ -70,32 +68,31 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-          <el-form-item label="创建时间：" :label-width="formLabelWidth">
-            <el-input :value="selectedRecord.createTime | formatDate"   :readonly = true></el-input>
+          <el-form-item v-if="isEdit" label="创建时间：" :label-width="formLabelWidth">
+            <el-input :value="selectedRecord.createTime | formatDate"   :readonly = isEdit></el-input>
           </el-form-item>
       </el-col>
 
       <el-col :span="12">
-          <el-form-item label="最后登录时间：" :label-width="formLabelWidth">
-            <el-input :value="selectedRecord.lastLoginTime | formatDate"  :readonly = true></el-input>
+          <el-form-item v-if="isEdit" label="最后登录时间：" :label-width="formLabelWidth">
+            <el-input :value="selectedRecord.lastLoginTime | formatDate"  :readonly = isEdit></el-input>
           </el-form-item>
       </el-col>
      
       </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogDetailVisible = false">取 消</el-button>
-        <el-button type="primary" @click="edit">确 定</el-button>
+        <el-button @click="action = ''">取 消</el-button>
+          <el-button type="primary" @click="addOrEdit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
-
 <script>
 
 
 import {formatDate} from '@/utils/date.js';
-import { getAdminList,getAdminDetail,adminEdit } from '@/api/admin'
+import { getAdminList,getAdminDetail,adminAddOrEdit,deleteAdmins } from '@/api/admin'
 import { mapGetters } from 'vuex'
 export default {
   data() {
@@ -103,39 +100,37 @@ export default {
       list: null,
       listLoading: true,
       page_size:10,   
-      currentPage: 1,    
+      currentPage: 1,
+      totalSize: 0,
       formLabelWidth: '90px',
-      usernameSearch:'',
      selectedRecord:{
        username:'',
        phone:''
      },
-     totalSize: 0,
-     dialogDetailVisible:false,
+     search:{
+        username:""
+      },
+     action:""
     }
   },
-  filters: {
-    statusCssFilter:function(status) {
-      const statusCssMap = {
-        0: 'danger',
-        1: 'success',
-        2: 'danger',
-        3: 'warning',
-        4: 'gray'
-      }
-      return statusCssMap[status]
+  computed: {
+
+    isEdit:function(){
+      return this.action=='edit'
     },
 
-    statusFilter:function(status) {
-      const statusMap = {
-        0: '待审核',
-        1: '通过',
-        2: '拒绝',
-        3: '待审核',//等待被访人审核
-        4: '待管理员审核'
-      }
-      return statusMap[status]
-    },
+    dialogDetailVisible:{
+      get:function(){
+        return this.action != null;
+      },
+      set:function(a){
+          console.log('a'+a)
+          this.action = '';
+      },
+    }
+  },
+
+  filters: {
       formatDate(time) {
           var date = new Date(time);
           return formatDate(date, 'yyyy-MM-dd hh:mm');
@@ -152,7 +147,7 @@ export default {
     fetchData() {
 
       this.listLoading = true
-      getAdminList({"page":this.currentPage, "size":this.page_size,"username": this.usernameSearch}).then(response => {
+      getAdminList({"page":this.currentPage, "size":this.page_size,"username": this.search.username}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
         for (var i=0;i<dataList.length;i++){
@@ -169,6 +164,12 @@ export default {
       })
     },
 
+//新增前清空实体
+    toAdd(){
+      this.action='add';
+      this.selectedRecord = {};
+    },
+//获取详情
     detail(data){
      
       this.selectedRecord=data;
@@ -177,52 +178,63 @@ export default {
           this.selectedRecord=response.data.data;
       })
     },
-    edit(){
-     
-     this.$refs.detail_form.validate(valid => {
+
+
+    addOrEdit(data){
+     this.$refs.edit_form.validate(valid => {
         if (valid) {
-          this.listLoading = true
-          adminEdit(this.selectedRecord).then(response => {
+          this.listLoading = true;
+          adminAddOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
             this.dialogDetailVisible = false;
             this.fetchData();
             this.$message({
-              message: '修改成功',
+              message: '操作成功',
               type: 'success'
             });
           }
-        this.listLoading = false
+        this.listLoading = false;
       }).catch(e => {
-        this.listLoading = false
+        this.listLoading = false;
       })
         } else {
-          console.log('error submit!!')
+          console.log('error submit!!');
         }
       })
     },
-    check(data,pass){
-      if(data.passLoading||data.rejectLoading){
-        return;
-      }
-      //check_status = 1: 通过 2：不通过
-      var check_status=2
-      if(pass){
-        data.passLoading=true;
-        check_status = 1
-      }else{
-        data.rejectLoading=true;
-      }
-      // checkVisitor(data.record_id,check_status,this.default_operator_id).then(response => {
-      //     data.passLoading=false;
-      //     data.rejectLoading=false;
-      //   if(response.resultCode=='SUCCESS'){
-      //     this.fetchData()
-      //   }
-      // }).catch(e =>{
-      //     data.passLoading=false;
-      //     data.rejectLoading=false;
-      // })
+   
+//删除
+  deleteRecord(data){
+    data.deleteLoading = true;
+    deleteAdmins([data.pkId]).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        data.deleteLoading = false;
+        this.fetchData();
+      }).catch(e => {
+         data.deleteLoading = false;
+      })
+  },
+//批量删除
+    batchDelete(){
+        var seletedIds = this._.map(this.multipleSelection, 'pkId');
+        this.listLoading = true;
+        deleteAdmins(seletedIds).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        this.listLoading = false;
+        this.fetchData();
+      }).catch(e => {
+        this.listLoading = false;
+      })
     },
+
      handleSizeChange(val) {
        localStorage.setItem('page_size',val)
         this.page_size = val;
@@ -233,16 +245,13 @@ export default {
         
         this.currentPage = val;
         this.fetchData();
+      },
+      handleSelectionChange(val) {
+         //多选发生变化
+        this.multipleSelection = val;
       }
 
   },
-  watch: {
-    // 如果 `question` 发生改变，这个函数就会运行
-    // default_operator_id: function (after, before) {
-    //   this.answer = 'Waiting for you to stop typing...:'+after
-    //   this.fetchData();
-    // },
-  }
 }
 </script>
 <style rel="stylesheet/scss" lang="scss">
