@@ -42,6 +42,25 @@ export default{
         callback(new Error('请输入合法的手机号!'))
     }
 
+
+
+    const isMoney = (rule, value, callback) => {
+       
+        if(value != null && value != "") {
+           
+            const reg =  /(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/
+            if (!reg.test(value)) {
+            callback(new Error('请输入合法的金额!'))
+            } else {
+                callback()
+            }
+        }
+        else{
+            callback();
+        }
+        callback(new Error('请输入合法的金额!'))
+    }
+
     
         Vue.prototype.filter_rules = function (item){
             
@@ -66,6 +85,9 @@ export default{
                         break;    
                     case 'mobile':
                         rules.push( { validator: isPhone, trigger: 'blur' });
+                        break;    
+                    case 'money':
+                        rules.push( { validator: isMoney, trigger: 'blur' });
                         break;    
                     default:
                         rules.push({});

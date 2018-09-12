@@ -67,12 +67,27 @@ export const constantRouterMap = [
     children: [
       {
         path: 'deviceList',
-        name: 'AdminList',
+        name: 'DeviceList',
         component: () => import('@/views/device/index'),
         meta: { title: '设备列表', icon: 'peoples' }
       }
     ]
   }, 
+  {
+    path: '/product',
+      component: Layout,
+      redirect: 'productList',
+      name: 'Product',
+      meta: { title: '商品管理', icon: 'example' },
+      children: [
+        {
+          path: 'productList',
+          name: 'ProductList',
+          component: () => import('@/views/product/index'),
+          meta: { title: '商品列表', icon: 'peoples' }
+        }
+      ]
+    }, 
 
   { path: '*', redirect: '/404', hidden: true }
 ]
