@@ -93,6 +93,25 @@
             </el-form-item>
         </el-col>
 
+        <el-col :span="12" >
+            <el-form-item label="所属商家：" :label-width="formLabelWidth">
+              <el-select v-model="selectedRecord.fkMerchantId" filterable placeholder="请选择">
+                <el-option
+                  key="0"
+                  label="平台"
+                  value='0'
+                  >
+                </el-option>
+                <el-option
+                  v-for="item in merchants"
+                  :key="item.pkId"
+                  :label="item.name"
+                  :value="item.pkId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+        </el-col>
+
         <el-col :span="24">
             <el-form-item label="备注：" :label-width="formLabelWidth" >
               <el-input v-model="selectedRecord.remark"  type="textarea" ></el-input>
@@ -112,7 +131,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { addOrEdit,getDeviceList,getDeviceDetail,deleteDevices} from '@/api/device'
+import { addOrEdit,getDeviceList,getDeviceDetail,deleteDevices,getDeviceMerchantList} from '@/api/device'
 export default {
   data() {
     return {
@@ -127,7 +146,8 @@ export default {
       search:{
         name:""
       },
-      action:""
+      action:"",
+      merchants:[]
     }
   },
   computed: {
@@ -156,6 +176,7 @@ export default {
   created() {
     this.page_size = localStorage.getItem('page_size')!=null ?   new Number(localStorage.getItem('page_size')) : 10;
     this.fetchData()
+    this.getMerchantList()
   },
 
   methods: {
@@ -242,6 +263,20 @@ export default {
         this.fetchData();
       }).catch(e => {
         this.listLoading = false;
+      })
+    },
+    getMerchantList(){
+        
+        getDeviceMerchantList().then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        this.merchants = response.data.data;
+       
+      }).catch(e => {
+       
       })
     },
 

@@ -28,7 +28,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/admin/adminList',
+    redirect: '/admin',
     name: 'Index',
     hidden: true,
     // children: [{
@@ -88,6 +88,21 @@ export const constantRouterMap = [
         }
       ]
     }, 
+    {
+      path: '/merchant',
+        component: Layout,
+        redirect: 'merchantList',
+        name: 'Merchant',
+        meta: { title: '商家管理', icon: 'example' },
+        children: [
+          {
+            path: 'merchantList',
+            name: 'MerchantList',
+            component: () => import('@/views/merchant/index'),
+            meta: { title: '商家列表', icon: 'peoples' }
+          }
+        ]
+      }, 
 
   { path: '*', redirect: '/404', hidden: true }
 ]

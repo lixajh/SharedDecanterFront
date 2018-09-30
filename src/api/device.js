@@ -25,3 +25,8 @@ export function deleteDevices(ids) {
   return post("/manager/device/delete",{'ids':ids.join()})
 }
 
+export function getDeviceMerchantList() {
+ 
+  return post("/manager/device/deviceMerchantList",{})
+}
+

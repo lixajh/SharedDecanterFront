@@ -2,12 +2,12 @@
   <div class="app-container">
     <!-- 搜索框 -->
     <el-input v-model="search.name" placeholder="名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
-    <el-input v-model="search.title" placeholder="标题" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.name" placeholder="标题" class="search-box" @keyup.enter.native="fetchData"></el-input>
     
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
     <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>
-    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
-    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量下架</el-button>
+    <!-- <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量下架</el-button> -->
       
     <!-- 表格区域 -->
     <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
@@ -24,14 +24,14 @@
           {{scope.row.name}}
         </template>
       </el-table-column>
-      <el-table-column label="标题" >
+      <el-table-column label="地址">
         <template slot-scope="scope">
-          {{scope.row.title}}
+          {{scope.row.address}}
         </template>
       </el-table-column>
-      <el-table-column label="状态" >
+      <el-table-column label="设备数量">
         <template slot-scope="scope">
-          {{scope.row.dataStatus}}
+          {{scope.row.deviceCount}}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" >
@@ -67,9 +67,9 @@
             <el-input v-model="selectedRecord.name"></el-input>
           </el-form-item>  
         </el-col>
-        <el-col :span="12">
-          <el-form-item label="标题：" :label-width="formLabelWidth" prop="title"  :rules="filter_rules({required:true,max:36})"  >
-            <el-input v-model="selectedRecord.title"  :readonly = isEdit></el-input>
+        <el-col :span="12" v-if="isEdit">
+          <el-form-item label="设备数量：" :label-width="formLabelWidth" prop="title">
+            <el-input :value="selectedRecord.deviceCount"  :readonly = isEdit></el-input>
           </el-form-item>
         </el-col>
          <el-col :span="12" v-if="isEdit">
@@ -78,8 +78,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="价格：" :label-width="formLabelWidth" prop="price" :rules="filter_rules({required:true, type:'money'})" >
-            <el-input v-model="selectedRecord.price" type="number" step=0.01 min=0.01 max=10 ></el-input>
+          <el-form-item label="联系人：" :label-width="formLabelWidth" prop="contact" :rules="filter_rules({required:true, max:30})" >
+            <el-input v-model="selectedRecord.contact" ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="电话：" :label-width="formLabelWidth" prop="phone" :rules="filter_rules({required:true, type:'mobile'})" >
+            <el-input v-model="selectedRecord.phone"></el-input>
           </el-form-item>
         </el-col>
 
@@ -90,8 +95,8 @@
         </el-col>
 
         <el-col :span="24">
-            <el-form-item label="商品描述：" :label-width="formLabelWidth" >
-              <el-input v-model="selectedRecord.itemDesc"  type="textarea" ></el-input>
+            <el-form-item label="地址：" :label-width="formLabelWidth"  prop="address" :rules="filter_rules({required:true, max:255})">
+              <el-input v-model="selectedRecord.address"  type="textarea" ></el-input>
             </el-form-item>
         </el-col>
 
@@ -114,7 +119,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { productAddOrEdit,getProductList,getProductDetail,deleteProducts} from '@/api/product'
+import { merchantAddOrEdit,getMerchantList,getMerchantDetail,deleteMerchants} from '@/api/merchant'
 export default {
   data() {
     return {
@@ -127,8 +132,7 @@ export default {
       formLabelWidth: '90px',
       multipleSelection:false,
       search:{
-        name:"",
-        title:""
+        name:""
       },
       action:""
     }
@@ -144,7 +148,6 @@ export default {
         return this.action != null;
       },
       set:function(a){
-          console.log('a'+a)
           this.action = '';
       },
     }
@@ -175,7 +178,7 @@ export default {
     //获取列表
     fetchData() {
       this.listLoading = true
-      getProductList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
+      getMerchantList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
         this.list = dataList;
@@ -197,7 +200,7 @@ export default {
      
       this.selectedRecord=data;
       this.action='edit';
-      getProductDetail(data.pkId).then(response => {
+      getMerchantDetail(data.pkId).then(response => {
         
           this.selectedRecord=response.data.data;
        
@@ -208,7 +211,7 @@ export default {
      this.$refs.edit_form.validate(valid => {
         if (valid) {
           this.listLoading = true;
-          productAddOrEdit(this.selectedRecord).then(response => {
+          merchantAddOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
             this.dialogDetailVisible = false;
             this.fetchData();
@@ -229,7 +232,7 @@ export default {
 //删除
   deleteRecord(data){
     data.deleteLoading = true;
-    deleteProducts([data.pkId]).then(response => {
+    deleteMerchants([data.pkId]).then(response => {
           this.$message({
               message: '操作成功',
               type: 'success'
@@ -245,7 +248,7 @@ export default {
     batchDelete(){
         var seletedIds = this._.map(this.multipleSelection, 'pkId');
         this.listLoading = true;
-        deleteProducts(seletedIds).then(response => {
+        deleteMerchants(seletedIds).then(response => {
           this.$message({
               message: '操作成功',
               type: 'success'

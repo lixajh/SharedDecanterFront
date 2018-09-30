@@ -124,7 +124,6 @@ export default {
         return this.action != null;
       },
       set:function(a){
-          console.log('a'+a)
           this.action = '';
       },
     }
@@ -171,11 +170,13 @@ export default {
     },
 //获取详情
     detail(data){
-     
+
       this.selectedRecord=data;
-      this.dialogDetailVisible = true;
+      this.action='edit';
+    
       getAdminDetail(data.pkId).then(response => {
           this.selectedRecord=response.data.data;
+          
       })
     },
 
@@ -186,7 +187,6 @@ export default {
           this.listLoading = true;
           adminAddOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
-            this.dialogDetailVisible = false;
             this.fetchData();
             this.$message({
               message: '操作成功',
