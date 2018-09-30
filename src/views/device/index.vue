@@ -268,10 +268,7 @@ export default {
     getMerchantList(){
         
         getDeviceMerchantList().then(response => {
-          this.$message({
-              message: '操作成功',
-              type: 'success'
-            });
+         
 
         this.merchants = response.data.data;
        
