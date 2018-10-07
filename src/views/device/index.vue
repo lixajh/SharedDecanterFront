@@ -99,7 +99,7 @@
                 <el-option
                   key="0"
                   label="平台"
-                  value='0'
+                  :value='0'
                   >
                 </el-option>
                 <el-option

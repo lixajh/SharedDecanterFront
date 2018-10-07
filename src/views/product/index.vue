@@ -7,7 +7,7 @@
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
     <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>
     <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
-    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量下架</el-button>
+    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchStopSell">批量下架</el-button>
       
     <!-- 表格区域 -->
     <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
@@ -31,7 +31,7 @@
       </el-table-column>
       <el-table-column label="状态" >
         <template slot-scope="scope">
-          {{scope.row.dataStatus}}
+          {{scope.row.dataStatus | statusFilter}}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" >
@@ -45,6 +45,8 @@
         <template slot-scope="scope">
           <el-button @click="detail(scope.row)" type="text" size="small">编辑</el-button>
           <el-button @click="deleteRecord(scope.row)"  type="text" size="small" :loading="scope.row.deleteLoading">删除</el-button>
+          <el-button @click="startSell(scope.row)"  type="text" size="small" :loading="scope.row.startSellLoading">上架</el-button>
+          <el-button @click="stopSell(scope.row)"  type="text" size="small" :loading="scope.row.stopSellLoading">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -114,7 +116,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { productAddOrEdit,getProductList,getProductDetail,deleteProducts} from '@/api/product'
+import { productAddOrEdit,getProductList,getProductDetail,deleteProducts,stopSellProducts,startSellProducts} from '@/api/product'
 export default {
   data() {
     return {
@@ -257,6 +259,71 @@ export default {
         this.listLoading = false;
       })
     },
+
+//下架
+stopSell(data){
+    data.stopSellLoading = true;
+    stopSellProducts([data.pkId]).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        data.stopSellLoading = false;
+        this.fetchData();
+      }).catch(e => {
+         data.stopSellLoading = false;
+      })
+  },
+
+//批量下架
+    batchStopSell(){
+        var seletedIds = this._.map(this.multipleSelection, 'pkId');
+        this.stopSellLoading = true;
+        stopSellProducts(seletedIds).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        this.listLoading = false;
+        this.fetchData();
+      }).catch(e => {
+        this.listLoading = false;
+      })
+    },
+
+    //上架
+startSell(data){
+    data.startSellLoading = true;
+    startSellProducts([data.pkId]).then(response => {
+          this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+
+        data.startSellLoading = false;
+        this.fetchData();
+      }).catch(e => {
+         data.stopSellLoading = false;
+      })
+  },
+  //批量上架
+  batchStartSell(){
+      var seletedIds = this._.map(this.multipleSelection, 'pkId');
+      this.listLoading = true;
+      startSellProducts(seletedIds).then(response => {
+        this.$message({
+            message: '操作成功',
+            type: 'success'
+          });
+
+      this.listLoading = false;
+      this.fetchData();
+    }).catch(e => {
+      this.listLoading = false;
+    })
+  },
 
      handleSizeChange(val) {
        //页面size发生变化

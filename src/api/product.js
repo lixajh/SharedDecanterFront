@@ -24,4 +24,12 @@ export function deleteProducts(ids) {
  
   return post("/manager/product/delete",{'ids':ids.join()})
 }
+export function startSellProducts(ids) {
+ 
+  return post("/manager/product/startSell",{'ids':ids.join()})
+}
+export function stopSellProducts(ids) {
+ 
+  return post("/manager/product/stopSell",{'ids':ids.join()})
+}
 
