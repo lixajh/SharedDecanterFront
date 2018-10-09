@@ -103,6 +103,21 @@ export const constantRouterMap = [
           }
         ]
       }, 
+      {
+        path: '/order',
+          component: Layout,
+          redirect: 'orderList',
+          name: 'Oerchant',
+          meta: { title: '订单管理', icon: 'example' },
+          children: [
+            {
+              path: 'merchantList',
+              name: 'MerchantList',
+              component: () => import('@/views/order/index'),
+              meta: { title: '订单列表', icon: 'peoples' }
+            }
+          ]
+        }, 
 
   { path: '*', redirect: '/404', hidden: true }
 ]
