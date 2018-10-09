@@ -1,8 +1,9 @@
 <template>
   <div class="app-container">
     <!-- 搜索框 -->
-    <el-input v-model="search.name" placeholder="名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
-    <el-input v-model="search.title" placeholder="标题" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.orderNo" placeholder="订单号" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.merchantName" placeholder="商家名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.transactionNo" placeholder="支付流水号" class="search-box" @keyup.enter.native="fetchData"></el-input>
     
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
     <!-- <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>
@@ -24,31 +25,56 @@
           {{scope.row.orderNo}}
         </template>
       </el-table-column>
+
+      <el-table-column label="总金额">
+        <template slot-scope="scope">
+          {{scope.row.totalFee}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="支付金额">
+        <template slot-scope="scope">
+          {{scope.row.payFee}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="支付流水号">
+        <template slot-scope="scope">
+          {{scope.row.transactionNo}}
+        </template>
+      </el-table-column>
+
+
       <el-table-column label="设备编号" >
         <template slot-scope="scope">
           {{scope.row.deviceCode}}
         </template>
       </el-table-column>
+
       <el-table-column label="商品名称" >
         <template slot-scope="scope">
           {{scope.row.productName}}
         </template>
       </el-table-column>
+
       <el-table-column label="商家名称" >
         <template slot-scope="scope">
           {{scope.row.merchantName}}
         </template>
       </el-table-column>
+
+       
+
       <el-table-column label="创建时间" >
         <template slot-scope="scope">
            <i class="el-icon-time"></i>
           <span>{{scope.row.createTime}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="支付时间" >
+
+      <el-table-column label="备注" >
         <template slot-scope="scope">
-           <i class="el-icon-time"></i>
-          <span>{{scope.row.payTime}}</span>
+          <span>{{scope.row.remark}}</span>
         </template>
       </el-table-column>
       
@@ -79,6 +105,13 @@
           </el-form-item>  
         </el-col>
 
+         <el-col :span="12">
+          <el-form-item label="支付流水号：" :label-width="formLabelWidth">
+            <el-input v-model="selectedRecord.transactionNo" :readonly = true></el-input>
+          </el-form-item>  
+        </el-col>
+
+
         <el-col :span="12">
           <el-form-item label="设备编号：" :label-width="formLabelWidth" >
             <el-input v-model="selectedRecord.deviceCode" :readonly = true></el-input>
@@ -92,6 +125,16 @@
         </el-col>
 
         <el-col :span="12">
+          <el-form-item label="总金额：" :label-width="formLabelWidth"  >
+            <el-input v-model="selectedRecord.totalFee" :readonly = true></el-input>
+          </el-form-item>  
+        </el-col>
+         <el-col :span="12">
+          <el-form-item label="实付金额：" :label-width="formLabelWidth"  >
+            <el-input v-model="selectedRecord.payFee" :readonly = true></el-input>
+          </el-form-item>  
+        </el-col>
+        <el-col :span="12">
           <el-form-item label="商家名称" :label-width="formLabelWidth"  >
             <el-input v-model="selectedRecord.merchantName" :readonly = true></el-input>
           </el-form-item>  
@@ -104,14 +147,26 @@
         </el-col>
 
         <el-col :span="12" v-if="isEdit">
+          <el-form-item label="用户昵称" :label-width="formLabelWidth" >
+            <el-input :value="selectedRecord.nickname"  :readonly = true></el-input>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12" v-if="isEdit">
+          <el-form-item label="用户openId" :label-width="formLabelWidth" >
+            <el-input :value="selectedRecord.openId"  :readonly = true></el-input>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12" v-if="isEdit">
             <el-form-item label="创建时间：" :label-width="formLabelWidth">
-              <el-input :value="selectedRecord.createTime | formatDate"  :readonly = true></el-input>
+              <el-input :value="selectedRecord.createTime "  :readonly = true></el-input>
             </el-form-item>
         </el-col>
 
         <el-col :span="12" v-if="isEdit">
             <el-form-item label="支付时间：" :label-width="formLabelWidth">
-              <el-input :value="selectedRecord.payTime | formatDate"  :readonly = true></el-input>
+              <el-input :value="selectedRecord.payTime"  :readonly = true></el-input>
             </el-form-item>
         </el-col>
 
@@ -125,7 +180,7 @@
     </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="action = ''">取 消</el-button>
-          <el-button type="primary" @click="addOrEdit">确 定</el-button>
+          <el-button type="primary" @click="edit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -133,7 +188,6 @@
 
 <script>
 
-import {formatDate} from '@/utils/date.js';
 import { orderEdit,getOrderList,getOrderDetail} from '@/api/order'
 export default {
   data() {
@@ -147,8 +201,9 @@ export default {
       formLabelWidth: '90px',
       multipleSelection:false,
       search:{
-        name:"",
-        title:""
+        orderNo:"",
+        merchantName:"",
+        transactionNo:""
       },
       action:""
     }

@@ -107,12 +107,12 @@ export const constantRouterMap = [
         path: '/order',
           component: Layout,
           redirect: 'orderList',
-          name: 'Oerchant',
+          name: 'Order',
           meta: { title: '订单管理', icon: 'example' },
           children: [
             {
-              path: 'merchantList',
-              name: 'MerchantList',
+              path: 'orderList',
+              name: 'OrderList',
               component: () => import('@/views/order/index'),
               meta: { title: '订单列表', icon: 'peoples' }
             }

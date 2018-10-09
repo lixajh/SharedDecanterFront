@@ -184,18 +184,19 @@ export default {
     addOrEdit(data){
      this.$refs.edit_form.validate(valid => {
         if (valid) {
-          this.listLoading = true;
           adminAddOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
+            this.action='';
+            this.listLoading = true;
             this.fetchData();
             this.$message({
               message: '操作成功',
               type: 'success'
             });
           }
-        this.listLoading = false;
+       
       }).catch(e => {
-        this.listLoading = false;
+     
       })
         } else {
           console.log('error submit!!');
