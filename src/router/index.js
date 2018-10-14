@@ -100,7 +100,13 @@ export const constantRouterMap = [
             name: 'MerchantList',
             component: () => import('@/views/merchant/index'),
             meta: { title: '商家列表', icon: 'peoples' }
-          }
+          },
+          {
+            path: 'merchantChartList',
+            name: 'MerchantChartList',
+            component: () => import('@/views/merchant/chart'),
+            meta: { title: '商家月报表', icon: 'peoples' }
+          },
         ]
       }, 
       {

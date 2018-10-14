@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 搜索框 -->
     <el-input v-model="search.name" placeholder="名称" class="search-box" @keyup.enter.native="fetchData"></el-input>
-    <el-input v-model="search.name" placeholder="标题" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <!-- <el-input v-model="search.name" placeholder="标题" class="search-box" @keyup.enter.native="fetchData"></el-input> -->
     
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
     <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button>

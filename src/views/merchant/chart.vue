@@ -2,12 +2,25 @@
   <div class="app-container">
     <!-- 搜索框 -->
     <el-input v-model="search.merchantName" placeholder="商户名" class="search-box" @keyup.enter.native="fetchData"></el-input>
-    <el-input v-model="search.startTime" placeholder="开始时间" class="search-box" @keyup.enter.native="fetchData"></el-input>
-    
+
+     <el-date-picker
+      v-model="search.startTime"
+      type="date"
+       @keyup.enter.native="fetchData"
+      placeholder="开始时间">
+    </el-date-picker>
+
+     <el-date-picker
+      v-model="search.endTime"
+      type="date"
+       @keyup.enter.native="fetchData"
+      placeholder="结束时间">
+    </el-date-picker>
+
+
+    <!-- <el-input v-model="search.startTime" placeholder="开始时间" class="search-box" @keyup.enter.native="fetchData"></el-input>
+    <el-input v-model="search.stopTime" placeholder="结束时间" class="search-box" @keyup.enter.native="fetchData"></el-input> -->
     <el-button  type="primary" icon="el-icon-search" @click="fetchData">搜索</el-button>
-    <!-- <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="toAdd">增加</el-button> -->
-    <!-- <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量删除</el-button>
-    <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="batchDelete">批量下架</el-button> -->
       
     <!-- 表格区域 -->
     <el-table class="table-frame"  :data="list" v-loading.body="listLoading" element-loading-text="加载中" border fit highlight-current-row @selection-change="handleSelectionChange">
@@ -24,16 +37,38 @@
           {{scope.row.name}}
         </template>
       </el-table-column>
-      <el-table-column label="地址">
+
+      <el-table-column label="交易额">
         <template slot-scope="scope">
-          {{scope.row.address}}
+          {{scope.row.totalAmount}}
         </template>
       </el-table-column>
-      <el-table-column label="设备数量">
+
+      <el-table-column label="计算提成">
         <template slot-scope="scope">
-          {{scope.row.deviceCount}}
+          {{scope.row.calBouns}}
         </template>
       </el-table-column>
+
+       <el-table-column label="实付提成">
+        <template slot-scope="scope">
+          {{scope.row.realBouns}}
+        </template>
+      </el-table-column>
+
+        <el-table-column label="提成计算方式">
+        <template slot-scope="scope">
+          {{scope.row.bounsCalType}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="提成系数">
+        <template slot-scope="scope">
+          {{scope.row.bounsRatio}}
+        </template>
+      </el-table-column>
+
+
       <el-table-column label="创建时间" >
         <template slot-scope="scope">
            <i class="el-icon-time"></i>
@@ -119,7 +154,7 @@
 <script>
 
 import {formatDate} from '@/utils/date.js';
-import { merchantAddOrEdit,getMerchantList,getMerchantDetail,deleteMerchants} from '@/api/merchant'
+import { merchantChartAddOrEdit,getMerchantChartList,getMerchantChartDetail,deleteMerchantCharts} from '@/api/merchantChart'
 export default {
   data() {
     return {
@@ -132,7 +167,9 @@ export default {
       formLabelWidth: '90px',
       multipleSelection:false,
       search:{
-        name:""
+        merchantChartName:"",
+        startTime:"",
+        stopTime:"",
       },
       action:""
     }
@@ -178,7 +215,7 @@ export default {
     //获取列表
     fetchData() {
       this.listLoading = true
-      getMerchantList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
+      getMerchantChartList({"page":this.currentPage, "size":this.page_size,"search":this.search}).then(response => {
         var data = response.data.data;
         var dataList = data.list;
         this.list = dataList;
@@ -200,7 +237,7 @@ export default {
      
       this.selectedRecord=data;
       this.action='edit';
-      getMerchantDetail(data.pkId).then(response => {
+      getMerchantChartDetail(data.pkId).then(response => {
         
           this.selectedRecord=response.data.data;
        
@@ -211,7 +248,7 @@ export default {
      this.$refs.edit_form.validate(valid => {
         if (valid) {
           this.listLoading = true;
-          merchantAddOrEdit(this.selectedRecord).then(response => {
+          merchantChartAddOrEdit(this.selectedRecord).then(response => {
           if(response.data.code == 200){
             this.dialogDetailVisible = false;
             this.fetchData();
@@ -232,7 +269,7 @@ export default {
 //删除
   deleteRecord(data){
     data.deleteLoading = true;
-    deleteMerchants([data.pkId]).then(response => {
+    deleteMerchantCharts([data.pkId]).then(response => {
           this.$message({
               message: '操作成功',
               type: 'success'
@@ -248,7 +285,7 @@ export default {
     batchDelete(){
         var seletedIds = this._.map(this.multipleSelection, 'pkId');
         this.listLoading = true;
-        deleteMerchants(seletedIds).then(response => {
+        deleteMerchantCharts(seletedIds).then(response => {
           this.$message({
               message: '操作成功',
               type: 'success'
