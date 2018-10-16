@@ -71,12 +71,12 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="标题：" :label-width="formLabelWidth" prop="title"  :rules="filter_rules({required:true,max:36})"  >
-            <el-input v-model="selectedRecord.title"  :readonly = isEdit></el-input>
+            <el-input v-model="selectedRecord.title"  ></el-input>
           </el-form-item>
         </el-col>
          <el-col :span="12" v-if="isEdit">
           <el-form-item label="状态：" :label-width="formLabelWidth" >
-            <el-input :value="selectedRecord.dataStatus | statusFilter"  :readonly = isEdit></el-input>
+            <el-input :value="selectedRecord.dataStatus | statusFilter"  :readonly = true></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -87,7 +87,7 @@
 
         <el-col :span="12" v-if="isEdit">
             <el-form-item label="创建时间：" :label-width="formLabelWidth">
-              <el-input :value="selectedRecord.createTime | formatDate"  :readonly = isEdit></el-input>
+              <el-input :value="selectedRecord.createTime | formatDate"  :readonly = true></el-input>
             </el-form-item>
         </el-col>
 
