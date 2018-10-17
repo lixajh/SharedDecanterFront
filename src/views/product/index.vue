@@ -91,6 +91,22 @@
             </el-form-item>
         </el-col>
 
+        <el-col :span="12" >
+            <el-form-item label="图片：" :label-width="formLabelWidth">
+              
+              <el-upload
+                :action= uploadUrl
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload">
+                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+          
+            </el-form-item>
+        </el-col>
+
+
         <el-col :span="24">
             <el-form-item label="商品描述：" :label-width="formLabelWidth" >
               <el-input v-model="selectedRecord.itemDesc"  type="textarea" ></el-input>
@@ -120,6 +136,8 @@ import { productAddOrEdit,getProductList,getProductDetail,deleteProducts,stopSel
 export default {
   data() {
     return {
+      uploadUrl:process.env.BASE_API + '/file/upload',
+      imageUrl: '',
       list: null,
       listLoading: true,
       page_size:10,
@@ -337,9 +355,29 @@ startSell(data){
         this.currentPage = val;
         this.fetchData();
       },
-       handleSelectionChange(val) {
+      handleSelectionChange(val) {
          //多选发生变化
         this.multipleSelection = val;
+      },
+      handleAvatarSuccess(res, file) {
+        // console.log(res)
+        // console.log(res.code)
+        this.imageUrl = res.data
+     
+        // this.imageUrl = URL.createObjectURL(file.raw);
+      },
+      beforeAvatarUpload(file) {
+        // const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+
+        // if (!isJPG) {
+        //   this.$message.error('上传图片只能是 JPG 格式!');
+        // }
+        if (!isLt2M) {
+          this.$message.error('上传图片大小不能超过 2MB!');
+        }
+        // return isJPG && isLt2M;
+        return isLt2M;
       }
 
   }
